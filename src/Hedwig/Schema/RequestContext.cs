@@ -1,8 +1,10 @@
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Security.Claims;
 using GraphQL.Authorization;
+using Hedwig.Security;
 
 namespace Hedwig.Schema
 {
@@ -25,23 +27,25 @@ namespace Hedwig.Schema
         /// </summary>
         /// <returns>an instantiated RequestContext</returns>
         public static readonly Func<HttpContext, RequestContext> RequestContextCreator = httpCtx => 
-            new RequestContext(httpCtx.User);
+            new RequestContext(httpCtx);
 
         /// <summary>
         /// A dictionary of arguments to make globally available to an entire query execution context
         /// </summary>
         public IDictionary<string, object> GlobalArguments { get; set; }
 
-        private ClaimsPrincipal _user { get; set; }
 
-        public ClaimsPrincipal User {
-            get { return _user; }
-        }
+        public ClaimsPrincipal User { get; private set; }
 
-        public RequestContext(ClaimsPrincipal user)
+        public PermissionsHelper PermissionsHelper { get; private set; }
+        public RequestContext(HttpContext httpContext)
         {
             GlobalArguments = new Dictionary<string, object>();
-            _user = user;
+            User = httpContext.User;
+            PermissionsHelper permissionsHelper = httpContext
+                .RequestServices
+                .GetRequiredService<PermissionsHelper>();
+            PermissionsHelper = permissionsHelper;
         }
     }
 }
