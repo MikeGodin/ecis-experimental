@@ -19,13 +19,13 @@ namespace HedwigTests.Repositories
 			{
 				// If organization permissions exist with user Ids, and each has an associated report
 				var user = UserHelper.CreateUser(context);
-				var orgPermission1 = PermissionHelper.CreateOrganizationPermission(context, user: user);
-				var orgPermission2 = PermissionHelper.CreateOrganizationPermission(context, user: user);
+				var orgPermission1 = PermissionHelper.CreateUserOrganizationPermission(context, user: user);
+				var orgPermission2 = PermissionHelper.CreateUserOrganizationPermission(context, user: user);
 				var report1 = ReportHelper.CreateCdcReport(context, organization: orgPermission1.Organization);
 				var report2 = ReportHelper.CreateCdcReport(context, organization: orgPermission2.Organization);
 
 				var otherUser = UserHelper.CreateUser(context);
-				var otherOrganizationPermission = PermissionHelper.CreateOrganizationPermission(context, user: otherUser);
+				var otherOrganizationPermission = PermissionHelper.CreateUserOrganizationPermission(context, user: otherUser);
 				var otherReport = ReportHelper.CreateCdcReport(context, organization: otherOrganizationPermission.Organization);
 
 				// When the report repository is queried with a user id

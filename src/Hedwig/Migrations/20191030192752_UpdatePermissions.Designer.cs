@@ -5,14 +5,16 @@ using Hedwig.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
-namespace Hedwig.Migrations
+namespace hedwig.Migrations
 {
     [DbContext(typeof(HedwigContext))]
-    partial class HedwigContextModelSnapshot : ModelSnapshot
+    [Migration("20191030192752_UpdatePermissions")]
+    partial class UpdatePermissions
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -248,7 +250,7 @@ namespace Hedwig.Migrations
                         .IsRequired()
                         .HasMaxLength(100);
 
-                    b.Property<int>("OrganizationId");
+                    b.Property<int?>("OrganizationId");
 
                     b.HasKey("Id");
 
@@ -306,7 +308,7 @@ namespace Hedwig.Migrations
                 {
                     b.HasBaseType("Hedwig.Models.EntityPermission");
 
-                    b.Property<Guid>("ChildId");
+                    b.Property<Guid?>("ChildId");
 
                     b.HasIndex("ChildId");
 
@@ -317,7 +319,7 @@ namespace Hedwig.Migrations
                 {
                     b.HasBaseType("Hedwig.Models.EntityPermission");
 
-                    b.Property<int>("EnrollmentId");
+                    b.Property<int?>("EnrollmentId");
 
                     b.HasIndex("EnrollmentId");
 
@@ -328,7 +330,7 @@ namespace Hedwig.Migrations
                 {
                     b.HasBaseType("Hedwig.Models.EntityPermission");
 
-                    b.Property<int>("FamilyId");
+                    b.Property<int?>("FamilyId");
 
                     b.HasIndex("FamilyId");
 
@@ -446,8 +448,7 @@ namespace Hedwig.Migrations
                 {
                     b.HasOne("Hedwig.Models.Organization", "Organization")
                         .WithMany("Sites")
-                        .HasForeignKey("OrganizationId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .HasForeignKey("OrganizationId");
                 });
 
             modelBuilder.Entity("Hedwig.Models.UserPermission", b =>
@@ -462,24 +463,21 @@ namespace Hedwig.Migrations
                 {
                     b.HasOne("Hedwig.Models.Child", "Child")
                         .WithMany()
-                        .HasForeignKey("ChildId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .HasForeignKey("ChildId");
                 });
 
             modelBuilder.Entity("Hedwig.Models.EnrollmentPermission", b =>
                 {
                     b.HasOne("Hedwig.Models.Enrollment", "Enrollment")
                         .WithMany()
-                        .HasForeignKey("EnrollmentId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .HasForeignKey("EnrollmentId");
                 });
 
             modelBuilder.Entity("Hedwig.Models.FamilyPermission", b =>
                 {
                     b.HasOne("Hedwig.Models.Family", "Family")
                         .WithMany()
-                        .HasForeignKey("FamilyId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .HasForeignKey("FamilyId");
                 });
 
             modelBuilder.Entity("Hedwig.Models.OrganizationReport", b =>

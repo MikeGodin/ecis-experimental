@@ -8,7 +8,7 @@ namespace HedwigTests.Helpers
 {
 	public class PermissionHelper
 	{
-		public static SitePermission CreateSitePermission(
+		public static UserSitePermission CreateUserSitePermission(
 			HedwigContext context,
 			User user = null,
 			Site site = null
@@ -17,17 +17,17 @@ namespace HedwigTests.Helpers
 			user = user ?? UserHelper.CreateUser(context);
 			site = site ?? SiteHelper.CreateSite(context);
 
-			var sitePermission = new SitePermission
+			var sitePermission = new UserSitePermission
 			{
 				SiteId = site.Id,
 				UserId = user.Id
 			};
-			context.Permissions.Add(sitePermission);
+			context.UserPermissions.Add(sitePermission);
 			context.SaveChanges();
 			return sitePermission;
 		}
 
-		public static OrganizationPermission CreateOrganizationPermission(
+		public static UserOrganizationPermission CreateUserOrganizationPermission(
 			HedwigContext context,
 			User user = null,
 			Organization org = null
@@ -36,12 +36,12 @@ namespace HedwigTests.Helpers
 			user = user ?? UserHelper.CreateUser(context);
 			org = org ?? OrganizationHelper.CreateOrganization(context);
 
-			var orgPermission = new OrganizationPermission
+			var orgPermission = new UserOrganizationPermission
 			{
 				OrganizationId = org.Id,
 				UserId = user.Id
 			};
-			context.Permissions.Add(orgPermission);
+			context.UserPermissions.Add(orgPermission);
 			context.SaveChanges();
 			return orgPermission;
 		}

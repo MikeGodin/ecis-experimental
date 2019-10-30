@@ -2,6 +2,7 @@ using Hedwig.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.AspNetCore.Http;
+using System.Linq;
 using System;
 
 namespace Hedwig.Data
@@ -16,16 +17,17 @@ namespace Hedwig.Data
 
 		public DbSet<Child> Children { get; set; }
 		public DbSet<Enrollment> Enrollments { get; set; }
+		public DbSet<EntityPermission> EntityPermissions { get; set; }
 		public DbSet<Family> Families { get; set; }
 		public DbSet<FamilyDetermination> FamilyDeterminations { get; set; }
 		public DbSet<Funding> Fundings { get; set; }
 		public DbSet<Organization> Organizations { get; set; }
-		public DbSet<Permission> Permissions { get; set; }
 		public DbSet<Report> Reports { get; set; }
 		public DbSet<ReportingPeriod> ReportingPeriods { get; set; }
 		public DbSet<Site> Sites { get; set; }
-		public DbSet<SitePermission> SitePermissions { get; set; }
 		public DbSet<User> Users { get; set; }
+
+		public DbSet<UserPermission> UserPermissions { get; set; }
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{
 			modelBuilder.Entity<Child>().ToTable("Child");
@@ -34,16 +36,34 @@ namespace Hedwig.Data
 			modelBuilder.Entity<FamilyDetermination>().ToTable("FamilyDetermination");
 			modelBuilder.Entity<Funding>().ToTable("Funding");
 			modelBuilder.Entity<Organization>().ToTable("Organization");
-			modelBuilder.Entity<Permission>().ToTable("Permission")
+			modelBuilder.Entity<UserPermission>().ToTable("UserPermission")
 				.HasDiscriminator<string>("Type")
-				.HasValue<OrganizationPermission>("Organization")
-				.HasValue<SitePermission>("Site");
+				.HasValue<UserOrganizationPermission>("Organization")
+				.HasValue<UserSitePermission>("Site");
+			modelBuilder.Entity<EntityPermission>().ToTable("EntityPermission")
+				.HasDiscriminator<string>("Type")
+				.HasValue<ChildPermission>("Child")
+				.HasValue<FamilyPermission>("Family")
+				.HasValue<EnrollmentPermission>("Enrollment");
+			UpdateForeignKeysUseRestrict<ChildPermission>(modelBuilder);
+			UpdateForeignKeysUseRestrict<FamilyPermission>(modelBuilder);
+			UpdateForeignKeysUseRestrict<EnrollmentPermission>(modelBuilder);
 			modelBuilder.Entity<Report>().ToTable("Report")
 				.HasDiscriminator<FundingSource>("Type")
 				.HasValue<CdcReport>(FundingSource.CDC);
 			modelBuilder.Entity<ReportingPeriod>().ToTable("ReportingPeriod");
 			modelBuilder.Entity<Site>().ToTable("Site");
+			UpdateForeignKeysUseRestrict<Site>(modelBuilder);
 			modelBuilder.Entity<User>().ToTable("User");
+
+		}
+
+		private void UpdateForeignKeysUseRestrict<T>(ModelBuilder modelBuilder)
+		{
+			foreach (var fk in modelBuilder.Model.GetEntityTypes(typeof(T)).SelectMany(et => et.GetForeignKeys()))
+			{
+				fk.DeleteBehavior = DeleteBehavior.Restrict;
+			}
 		}
 
 		/// <summary>

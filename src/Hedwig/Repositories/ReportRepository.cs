@@ -15,10 +15,10 @@ namespace Hedwig.Repositories
 
 		public async Task<IEnumerable<Report>> GetReportsByUserIdAsync(int userId)
 		{
-			var permissions = _context.Permissions.Where(p => userId == p.UserId);
+			var permissions = _context.UserPermissions.Where(p => userId == p.UserId);
 
 			var organizationPermissions = permissions
-				.OfType<OrganizationPermission>()
+				.OfType<UserOrganizationPermission>()
 				.Include(p => p.Organization)
 					.ThenInclude(o => o.Reports)
 						.ThenInclude(r => r.ReportingPeriod)
