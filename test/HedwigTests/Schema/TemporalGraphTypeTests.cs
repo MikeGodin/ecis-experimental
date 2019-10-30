@@ -15,7 +15,7 @@ namespace HedwigTests.Schema
         {
             var context = new ResolveFieldContext<object>();
             var httpCtx = new Mock<HttpContext>();
-            var userContext= new RequestContext(httpCtx.Object.User);
+            var userContext= new RequestContext(httpCtx.Object);
             var globalArguments = new Dictionary<string, object>();
             userContext.GlobalArguments = globalArguments;
             context.UserContext = userContext;
@@ -32,7 +32,7 @@ namespace HedwigTests.Schema
         {
             var context = new ResolveFieldContext<object>();
             var httpCtx = new Mock<HttpContext>();
-            var userContext= new RequestContext(httpCtx.Object.User);
+            var userContext= new RequestContext(httpCtx.Object);
             var globalArguments = new Dictionary<string, object>();
             DateTime asOf = DateTime.Now;
             userContext.GlobalArguments = globalArguments;
@@ -47,7 +47,7 @@ namespace HedwigTests.Schema
         {
             var context = new ResolveFieldContext<object>();
             var httpCtx = new Mock<HttpContext>();
-            var userContext= new RequestContext(httpCtx.Object.User);
+            var userContext= new RequestContext(httpCtx.Object);
             userContext.GlobalArguments = new Dictionary<string, object>();
             context.UserContext = userContext;
 

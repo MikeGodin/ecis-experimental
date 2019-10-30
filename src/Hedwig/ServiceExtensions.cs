@@ -57,6 +57,7 @@ namespace Hedwig
 			services.AddScoped<IReportRepository, ReportRepository>();
 			services.AddScoped<ISiteRepository, SiteRepository>();
 			services.AddScoped<IUserRepository, UserRepository>();
+			services.AddScoped<IPermissionRepository, PermissionRepository>();
 		}
 
 		public static void ConfigureGraphQL(this IServiceCollection services)
@@ -94,6 +95,7 @@ namespace Hedwig
 
 		public static void ConfigureAuthentication(this IServiceCollection services)
 		{
+			services.AddScoped<PermissionsHelper>();
 			JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
 			services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 				.AddJwtBearer(options =>
