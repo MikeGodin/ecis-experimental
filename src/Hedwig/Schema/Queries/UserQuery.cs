@@ -7,7 +7,7 @@ using System.Security.Claims;
 
 namespace Hedwig.Schema.Queries
 {
-	public class UserQuery : HedwigGraphType<object>, IAppSubQuery
+	public class UserQuery : ObjectGraphType<object>, IAppSubQuery
 	{
 		public UserQuery(IUserRepository repository)
 		{
@@ -27,7 +27,7 @@ namespace Hedwig.Schema.Queries
 				arguments: new QueryArguments(),
 				resolve: context =>
 				{
-					var user = GetRequestContext(context).User;
+					var user = RequestContextAccessor.GetRequestContext(context).User;
 					var subClaim = user.FindFirst("sub");
 					var id = Int32.Parse(subClaim?.Value ?? "");
 					return repository.GetUserByIdAsync(id);

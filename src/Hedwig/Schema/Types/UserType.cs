@@ -6,7 +6,7 @@ using GraphQL.Authorization;
 
 namespace Hedwig.Schema.Types
 {
-	public class UserType : HedwigGraphType<User>, IAuthorizedGraphType
+	public class UserType : ObjectGraphType<User>, IAuthorizedGraphType
 	{
 		public UserType(ISiteRepository sites, IReportRepository reports)
 		{
