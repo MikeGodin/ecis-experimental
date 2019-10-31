@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Hedwig.Models
 {
-	public class FamilyDetermination : SiteOwnedEntity
+	public class FamilyDetermination : TemporalEntity
 	{
 		public int Id { get; set; }
 

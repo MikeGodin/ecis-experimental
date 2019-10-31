@@ -78,7 +78,6 @@ namespace Hedwig.Data
 					Income = 20000M,
 					Determined = DateTime.Parse("2019-08-01"),
 					FamilyId = f.Id,
-					SiteId = sites[0].Id
 				}
 			);
 
@@ -89,7 +88,6 @@ namespace Hedwig.Data
 					Income = 20000M,
 					Determined = DateTime.Parse("2018-05-01"),
 					FamilyId = f.Id,
-					SiteId = sites[0].Id
 				}
 			);
 
@@ -259,7 +257,6 @@ namespace Hedwig.Data
 					EnrollmentId = e.Id,
 					Entry = e.Entry,
 					Source = FundingSource.CDC,
-					SiteId = sites[0].Id
 				}
 			).ToArray();
 
