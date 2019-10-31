@@ -3,15 +3,12 @@ using System.Collections.Generic;
 
 namespace Hedwig.Models
 {
-	public class Enrollment : TemporalEntity
+	public class Enrollment : SiteOwnedEntity
 	{
 		public int Id { get; set; }
 
 		public Guid ChildId { get; set; }
 		public Child Child { get; set; }
-
-		public int SiteId { get; set; }
-		public Site Site { get; set; }
 
 		public DateTime Entry { get; set; }
 

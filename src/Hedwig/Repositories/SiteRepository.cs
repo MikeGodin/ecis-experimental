@@ -16,9 +16,9 @@ namespace Hedwig.Repositories
 		public async Task<ILookup<int, Site>> GetSitesByOrganizationIdsAsync(IEnumerable<int> organizationIds)
 		{
 			var sites = await _context.Sites
-				.Where(s => s.OrganizationId.HasValue && organizationIds.Contains(s.OrganizationId.Value))
+				.Where(s => organizationIds.Contains(s.OrganizationId))
 				.ToListAsync();
-			return sites.ToLookup(x => x.OrganizationId.Value);
+			return sites.ToLookup(x => x.OrganizationId);
 		}
 
 		public async Task<IEnumerable<Site>> GetSitesByUserIdAsync(int userId)

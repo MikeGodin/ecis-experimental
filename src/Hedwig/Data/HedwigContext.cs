@@ -2,6 +2,7 @@ using Hedwig.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.AspNetCore.Http;
+using System.Linq;
 using System;
 
 namespace Hedwig.Data
@@ -24,15 +25,20 @@ namespace Hedwig.Data
 		public DbSet<Report> Reports { get; set; }
 		public DbSet<ReportingPeriod> ReportingPeriods { get; set; }
 		public DbSet<Site> Sites { get; set; }
-		public DbSet<SitePermission> SitePermissions { get; set; }
 		public DbSet<User> Users { get; set; }
+
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{
 			modelBuilder.Entity<Child>().ToTable("Child");
+			UpdateSiteForeignKeyUseRestrict<Child>(modelBuilder);
 			modelBuilder.Entity<Enrollment>().ToTable("Enrollment");
+			UpdateSiteForeignKeyUseRestrict<Enrollment>(modelBuilder);
 			modelBuilder.Entity<Family>().ToTable("Family");
+			UpdateSiteForeignKeyUseRestrict<Family>(modelBuilder);
 			modelBuilder.Entity<FamilyDetermination>().ToTable("FamilyDetermination");
+			UpdateSiteForeignKeyUseRestrict<FamilyDetermination>(modelBuilder);
 			modelBuilder.Entity<Funding>().ToTable("Funding");
+			UpdateSiteForeignKeyUseRestrict<Funding>(modelBuilder);
 			modelBuilder.Entity<Organization>().ToTable("Organization");
 			modelBuilder.Entity<Permission>().ToTable("Permission")
 				.HasDiscriminator<string>("Type")
@@ -43,7 +49,23 @@ namespace Hedwig.Data
 				.HasValue<CdcReport>(FundingSource.CDC);
 			modelBuilder.Entity<ReportingPeriod>().ToTable("ReportingPeriod");
 			modelBuilder.Entity<Site>().ToTable("Site");
+			UpdateForeignKeysUseRestrict<Site>(modelBuilder);
 			modelBuilder.Entity<User>().ToTable("User");
+
+		}
+
+		private void UpdateSiteForeignKeyUseRestrict<T>(ModelBuilder modelBuilder)
+		{
+			UpdateForeignKeysUseRestrict<T>(modelBuilder, typeof(Site));
+		}
+		private void UpdateForeignKeysUseRestrict<T>(ModelBuilder modelBuilder, Type fkEntityType = null)
+		{
+			foreach (var fk in modelBuilder.Model.GetEntityTypes(typeof(T)).SelectMany(et => et.GetForeignKeys()))
+			{
+				if(fkEntityType != null && !fk.PrincipalEntityType.ClrType.Equals(fkEntityType)) continue;
+
+				fk.DeleteBehavior = DeleteBehavior.Restrict;
+			}
 		}
 
 		/// <summary>
@@ -58,7 +80,7 @@ namespace Hedwig.Data
 		public override EntityEntry<TEntity> Add<TEntity> (TEntity entity)
 		{
 			if(IsTemporalEntityType<TEntity>()) {
-				AddAuthorToTemporalEntity(entity as TemporalEntity);
+				AddAuthorToTemporalEntity(entity as SiteOwnedEntity);
 			}
 
 			return base.Add<TEntity>(entity);
@@ -76,7 +98,7 @@ namespace Hedwig.Data
 		public override EntityEntry<TEntity> Update<TEntity> (TEntity entity)
 		{
 			if(IsTemporalEntityType<TEntity>()){
-				AddAuthorToTemporalEntity(entity as TemporalEntity);
+				AddAuthorToTemporalEntity(entity as SiteOwnedEntity);
 			}
 			return base.Update<TEntity>(entity);
 		}
@@ -88,14 +110,14 @@ namespace Hedwig.Data
 		/// <returns>True if type T is subclass of TemporalEntity, else false.</returns>
 		private bool IsTemporalEntityType<T>()
 		{
-			return typeof(TemporalEntity).IsAssignableFrom(typeof(T));
+			return typeof(SiteOwnedEntity).IsAssignableFrom(typeof(T));
 		}
 
 		/// <summary>
 		/// Adds author UserId to AuthorId field on temporal entity
 		/// </summary>
 		/// <param name="entity"></param>
-		protected void AddAuthorToTemporalEntity(TemporalEntity entity)
+		protected void AddAuthorToTemporalEntity(SiteOwnedEntity entity)
 		{
 			entity.AuthorId = GetCurrentUserId();
 		}

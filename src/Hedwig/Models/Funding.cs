@@ -2,7 +2,7 @@ using System;
 
 namespace Hedwig.Models
 {
-	public class Funding : TemporalEntity
+	public class Funding : SiteOwnedEntity
 	{
 		public int Id { get; set; }
 
