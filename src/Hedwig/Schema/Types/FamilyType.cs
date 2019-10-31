@@ -40,9 +40,9 @@ namespace Hedwig.Schema.Types
 		public AuthorizationRules Permissions(AuthorizationRules rules)
 		{
 			rules.DenyNot(Hedwig.Security.Permissions.IS_AUTHENTICATED_USER_POLICY);
+			rules.Allow(Hedwig.Security.Permissions.USER_CAN_ACCESS_FAMILY_POLICY);
 			rules.Allow(Hedwig.Security.Permissions.IS_DEVELOPER_IN_DEV_POLICY);
 			rules.Allow(Hedwig.Security.Permissions.IS_TEST_MODE_POLICY);
-			rules.Allow(Hedwig.Security.Permissions.USER_CAN_ACCESS_FAMILY_POLICY);
 			rules.Deny();
 			return rules;
 		}
