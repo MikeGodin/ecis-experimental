@@ -62,7 +62,7 @@ namespace Hedwig.Data
 			context.SaveChanges();
 
 			var families = Enumerable.Range(1, 15)
-				.Select(i => new Family())
+				.Select(i => new Family{SiteId = sites[0].Id})
 				.ToArray();
 
 			foreach (Family f in families)
@@ -77,7 +77,8 @@ namespace Hedwig.Data
 					NumberOfPeople = 3,
 					Income = 20000M,
 					Determined = DateTime.Parse("2019-08-01"),
-					FamilyId = f.Id
+					FamilyId = f.Id,
+					SiteId = sites[0].Id
 				}
 			);
 
@@ -87,7 +88,8 @@ namespace Hedwig.Data
 					NumberOfPeople = 3,
 					Income = 20000M,
 					Determined = DateTime.Parse("2018-05-01"),
-					FamilyId = f.Id
+					FamilyId = f.Id,
+					SiteId = sites[0].Id
 				}
 			);
 
@@ -102,63 +104,92 @@ namespace Hedwig.Data
 			var children = new Child[] {
 				new Child { FirstName = "Alan", LastName = "Rickman",
 					Birthdate = DateTime.Parse("2018-12-07"), Gender = Gender.Male,
-					FamilyId = families[0].Id
+					FamilyId = families[0].Id,
+					SiteId = sites[0].Id
 				},
 				new Child { FirstName = "David", LastName = "Thewlis",
 					Birthdate = DateTime.Parse("2016-07-29"), Gender = Gender.Male,
-					FamilyId = families[1].Id
+					FamilyId = families[1].Id,
+					SiteId = sites[0].Id
+
 				},
 				new Child { FirstName = "Helena", LastName = "Bonham Carter",
 					Birthdate = DateTime.Parse("2016-01-01"), Gender = Gender.Female,
-					FamilyId = families[2].Id
+					FamilyId = families[2].Id,
+					SiteId = sites[0].Id
+
 				},
 				new Child { FirstName = "Maggie", LastName = "Smith",
 					Birthdate = DateTime.Parse("2015-02-02"), Gender = Gender.Female,
-					FamilyId = families[3].Id
+					FamilyId = families[3].Id,
+					SiteId = sites[0].Id
+
 				},
 				new Child { FirstName = "Michael", LastName = "Gambon",
 					Birthdate = DateTime.Parse("2015-07-06"), Gender = Gender.Male,
-					FamilyId = families[4].Id
+					FamilyId = families[4].Id,
+					SiteId = sites[0].Id
+
 				},
 				new Child { FirstName = "Richard", LastName = "Griffiths",
 					Birthdate = DateTime.Parse("2018-07-02"), Gender = Gender.Male,
-					FamilyId = families[5].Id
+					FamilyId = families[5].Id,
+					SiteId = sites[0].Id
+
 				},
 				new Child { FirstName = "Richard", LastName = "Harris",
 					Birthdate = DateTime.Parse("2015-12-23"), Gender = Gender.Male,
-					FamilyId = families[6].Id
+					FamilyId = families[6].Id,
+					SiteId = sites[0].Id
+
 				},
 				new Child { FirstName = "Warwick", LastName = "Davis",
 					Birthdate = DateTime.Parse("2018-11-25"), Gender = Gender.Male,
-					FamilyId = families[7].Id
+					FamilyId = families[7].Id,
+					SiteId = sites[0].Id
+
 				},
 				new Child { FirstName = "Emma", LastName = "Thompson",
 					Birthdate = DateTime.Parse("2016-08-03"), Gender = Gender.Female,
-					FamilyId = families[8].Id
+					FamilyId = families[8].Id,
+					SiteId = sites[0].Id
+
 				},
 				new Child { FirstName = "Robbie", LastName = "Coltrane",
 					Birthdate = DateTime.Parse("2017-10-27"), Gender = Gender.Male,
-					FamilyId = families[9].Id
+					FamilyId = families[9].Id,
+					SiteId = sites[0].Id
+
 				},
 				new Child { FirstName = "David", LastName = "Bradley",
 					Birthdate = DateTime.Parse("2014-11-20"), Gender = Gender.Male,
-					FamilyId = families[10].Id
+					FamilyId = families[10].Id,
+					SiteId = sites[0].Id
+
 				},
 				new Child { FirstName = "John", LastName = "Cleese",
 					Birthdate = DateTime.Parse("2015-10-21"), Gender = Gender.Male,
-					FamilyId = families[11].Id
+					FamilyId = families[11].Id,
+					SiteId = sites[0].Id
+
 				},
 				new Child { FirstName = "John", LastName = "Hurt",
 					Birthdate = DateTime.Parse("2018-02-14"), Gender = Gender.Male,
-					FamilyId = families[12].Id
+					FamilyId = families[12].Id,
+					SiteId = sites[0].Id
+
 				},
 				new Child { FirstName = "Kenneth", LastName = "Branagh",
 					Birthdate = DateTime.Parse("2018-08-19"), Gender = Gender.Male,
-					FamilyId = families[13].Id
+					FamilyId = families[13].Id,
+					SiteId = sites[0].Id
+
 				},
 				new Child { FirstName = "Miranda", LastName = "Richardson",
 					Birthdate = DateTime.Parse("2018-11-09"), Gender = Gender.Female,
-					FamilyId = families[14].Id
+					FamilyId = families[14].Id,
+					SiteId = sites[0].Id
+
 				}
 			};
 
@@ -227,7 +258,8 @@ namespace Hedwig.Data
 				{
 					EnrollmentId = e.Id,
 					Entry = e.Entry,
-					Source = FundingSource.CDC
+					Source = FundingSource.CDC,
+					SiteId = sites[0].Id
 				}
 			).ToArray();
 

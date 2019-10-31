@@ -7,7 +7,7 @@ using GraphQL.Types;
 
 namespace Hedwig.Schema.Types
 {
-	public class ChildType : TemporalGraphType<Child>, IAuthorizedGraphType
+	public class ChildType : TemporalGraphType<Child>
 	{
 		public ChildType(IDataLoaderContextAccessor dataLoader, IFamilyRepository families)
 		{
@@ -42,12 +42,20 @@ namespace Hedwig.Schema.Types
 				}
 			);
 		}
+	}
+
+	public class ChildQueryType : ChildType, IAuthorizedGraphType
+	{
+		public ChildQueryType(IDataLoaderContextAccessor dataLoader, IFamilyRepository families)
+			: base(dataLoader, families)
+		{}
 
 		public AuthorizationRules Permissions(AuthorizationRules rules)
 		{
-			rules.DenyNot("IsAuthenticatedUserPolicy");
-			rules.Allow("IsDeveloperInDevPolicy");
-			rules.Allow("IsTestModePolicy");
+			rules.DenyNot(Hedwig.Security.Permissions.IS_AUTHENTICATED_USER_POLICY);
+			rules.Allow(Hedwig.Security.Permissions.IS_DEVELOPER_IN_DEV_POLICY);
+			rules.Allow(Hedwig.Security.Permissions.IS_TEST_MODE_POLICY);
+			rules.Allow(Hedwig.Security.Permissions.USER_CAN_ACCESS_CHILD_POLICY);
 			rules.Deny();
 			return rules;
 		}

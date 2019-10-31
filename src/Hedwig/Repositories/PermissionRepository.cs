@@ -12,35 +12,28 @@ namespace Hedwig.Repositories
     {
         public PermissionRepository(HedwigContext context) : base(context) {}
 
-        public Task<FamilyPermission> GetFamilyPermissionByFamilyIdAsync(int familyId)
+        public Task<List<SitePermission>> GetSitePermissionsByUserId(int userId, bool includeOrganizations = false)
         {
-            return _context.EntityPermissions
-                .OfType<FamilyPermission>()
-                .FirstOrDefaultAsync(ep => ep.FamilyId == familyId);
-        }
-
-        public Task<List<UserSitePermission>> GetSitePermissionsByUserId(int userId, bool includeOrganizations = false)
-        {
-            var q = _context.UserPermissions
-                .OfType<UserSitePermission>()
+            var q = _context.Permissions
+                .OfType<SitePermission>()
                 .Where(sp => sp.UserId == userId);
 
             if(includeOrganizations)  {
-                q.Include(sp => sp.Site)
+                q = q.Include(sp => sp.Site)
                     .ThenInclude(s=> s.Organization);
             }
 
             return q.ToListAsync();
         }
 
-        public Task<List<UserOrganizationPermission>> GetOrganizationPermissionsByUserId(int userId, bool includeSites = false)
+        public Task<List<OrganizationPermission>> GetOrganizationPermissionsByUserId(int userId, bool includeSites = false)
         {
-            var q = _context.UserPermissions
-                .OfType<UserOrganizationPermission>()
-                .Where(op => op.UserId == userId);
+            var q = _context.Permissions
+                .Where(op => op.UserId == userId)
+                .OfType<OrganizationPermission>();
 
             if(includeSites) {
-                q.Include(op => op.Organization)
+                q = q.Include(op => op.Organization)
                     .ThenInclude(o => o.Sites);                
             }
             
@@ -50,8 +43,7 @@ namespace Hedwig.Repositories
 
     public interface IPermissionRepository
     {
-        Task<FamilyPermission> GetFamilyPermissionByFamilyIdAsync(int familyId);
-        Task<List<UserSitePermission>> GetSitePermissionsByUserId(int userId, bool includeOrganizations = false);
-        Task<List<UserOrganizationPermission>> GetOrganizationPermissionsByUserId(int userId, bool includeSites = false);
+        Task<List<SitePermission>> GetSitePermissionsByUserId(int userId, bool includeOrganizations = false);
+        Task<List<OrganizationPermission>> GetOrganizationPermissionsByUserId(int userId, bool includeSites = false);
     }
 }
