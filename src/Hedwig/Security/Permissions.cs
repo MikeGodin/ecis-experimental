@@ -10,6 +10,8 @@ namespace Hedwig.Security
       public static string IS_TEST_MODE_POLICY = "IsTestModePolicy";
       public static string USER_CAN_ACCESS_CHILD_POLICY = "UserCanAccessChildPolicy";
       public static string USER_CAN_ACCESS_FAMILY_POLICY = "UserCanAccessFamilyPolicy";
+
+      public static string USER_CAN_ACCESS_ENROLLMENT_POLICY = "UserCanAccessEnrollmentPolicy";
       
       // DevelopmentRequirement needs DI access to IHostingEnvironment
       private readonly DevelopmentRequirement _developmentRequirement;
@@ -44,6 +46,9 @@ namespace Hedwig.Security
 
         authSettings.AddPolicy(USER_CAN_ACCESS_FAMILY_POLICY, policy => 
           policy.AddRequirement(new FamilyAccessRequirement()));
+
+        authSettings.AddPolicy(USER_CAN_ACCESS_ENROLLMENT_POLICY, policy =>
+          policy.AddRequirement(new EnrollmentAccessRequirement()));
 
         return authSettings;
       }

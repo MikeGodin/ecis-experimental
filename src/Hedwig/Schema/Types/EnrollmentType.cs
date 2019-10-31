@@ -7,7 +7,7 @@ using GraphQL.Types;
 
 namespace Hedwig.Schema.Types
 {
-	public class EnrollmentType : TemporalGraphType<Enrollment>, IAuthorizedGraphType
+	public class EnrollmentType : TemporalGraphType<Enrollment> 
 	{
 		public EnrollmentType(IDataLoaderContextAccessor dataLoader, IChildRepository children, IFundingRepository fundings)
 		{
@@ -42,11 +42,18 @@ namespace Hedwig.Schema.Types
 			);
 		}
 
+	}
+	public class EnrollmentQueryType : EnrollmentType, IAuthorizedGraphType
+	{ 
+		public EnrollmentQueryType(IDataLoaderContextAccessor dataLoader, IChildRepository children, IFundingRepository funding)
+		: base(dataLoader, children, funding)
+		{}	
 		public AuthorizationRules Permissions(AuthorizationRules rules)
 		{
-			rules.DenyNot("IsAuthenticatedUserPolicy");
-			rules.Allow("IsDeveloperInDevPolicy");
-			rules.Allow("IsTestModePolicy");
+			rules.DenyNot(Hedwig.Security.Permissions.IS_AUTHENTICATED_USER_POLICY);
+			rules.Allow(Hedwig.Security.Permissions.IS_DEVELOPER_IN_DEV_POLICY);
+			rules.Allow(Hedwig.Security.Permissions.IS_TEST_MODE_POLICY);
+			rules.Allow(Hedwig.Security.Permissions.USER_CAN_ACCESS_ENROLLMENT_POLICY);
 			rules.Deny();
 			return rules;
 		}
