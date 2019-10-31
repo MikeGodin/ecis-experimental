@@ -26,7 +26,7 @@ namespace Hedwig.Schema.Mutations
 					if (enrollment == null)
 					{
 						throw new ExecutionError(
-							AppErrorMessages.NOT_FOUND("Enrollment", id)
+							ErrorMessages.NOT_FOUND("Enrollment", id)
 						);
 					}
 

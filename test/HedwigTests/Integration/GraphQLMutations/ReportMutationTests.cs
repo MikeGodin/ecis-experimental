@@ -1,8 +1,8 @@
 using Xunit;
 using System.Threading.Tasks;
 using System;
+using Hedwig;
 using Hedwig.Models;
-using Hedwig.Schema;
 using HedwigTests.Fixtures;
 using HedwigTests.Helpers;
 
@@ -54,7 +54,7 @@ namespace HedwigTests.Integration.GraphQLMutations
                 );
                 var gqlResponse = await response.ParseGraphQLResponse();
                 Assert.NotEmpty(gqlResponse.Errors);
-                Assert.Equal(AppErrorMessages.NOT_FOUND("Report", invalidId), gqlResponse.Errors[0].Message);
+                Assert.Equal(ErrorMessages.NOT_FOUND("Report", invalidId), gqlResponse.Errors[0].Message);
             }
         }
     }

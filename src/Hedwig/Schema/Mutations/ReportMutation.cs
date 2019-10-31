@@ -24,7 +24,7 @@ namespace Hedwig.Schema.Mutations
                     var report = (CdcReport) await repository.GetReportByIdAsync(id);
                     if (report == null) {
                         throw new ExecutionError(
-                            AppErrorMessages.NOT_FOUND("Report", id)
+                            ErrorMessages.NOT_FOUND("Report", id)
                         );
                     }
 
