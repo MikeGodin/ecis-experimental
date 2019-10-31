@@ -23,14 +23,14 @@ namespace Hedwig.Security
                 if(! await permissionsHelper.UserCanAccessFamily(enrollmentId, userId)) {
                     context.ReportError(ErrorMessages.USER_CANNOT_ACCESS_ENTITY("Enrollment"));
                 }
-                return;
             }
-
-            // enrollmentId is not present --> check user can access funding
-            // by checking that they can access associated enrollment
-            var fundingId = Int32.Parse(fundingIdString);
-            if(! await permissionsHelper.UserCanAccessEnrollmentForFunding(fundingId, userId)) {
-                context.ReportError(ErrorMessages.USER_CANNOT_ACCESS_ENTITY("Funding"));
+            
+            // fundingId is present --> check user can access funding
+            if(fundingIdString != null) {
+                var fundingId = Int32.Parse(fundingIdString);
+                if(! await permissionsHelper.UserCanAccessEnrollmentForFunding(fundingId, userId)) {
+                    context.ReportError(ErrorMessages.USER_CANNOT_ACCESS_ENTITY("Funding"));
+                }
             }
         }
     }

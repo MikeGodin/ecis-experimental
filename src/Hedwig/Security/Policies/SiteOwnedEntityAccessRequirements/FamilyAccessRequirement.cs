@@ -8,19 +8,29 @@ namespace Hedwig.Security
         public async Task Authorize(AuthorizationContext context)
         {
             var familyIdString = (string) context.Arguments.ValueFor("id")?.Value;
+            var siteIdString = (string) context.Arguments.ValueFor("siteId")?.Value;
             var userIdString = (string) context.User.FindFirst("sub")?.Value;
 
-            // No id or userId present --> nothing to check
-            if (familyIdString == null || userIdString == null) return;
+            // No userId present --> nothing to check
+            if (userIdString == null) return;
 
-
-            var familyId = Int32.Parse(familyIdString);
             var userId = Int32.Parse(userIdString);
-
-            // check user can access family
             var permissionsHelper = RequestContextAccessor.GetRequestContext(context).PermissionsHelper;
-            if(! await permissionsHelper.UserCanAccessFamily(familyId, userId)){
-                context.ReportError(ErrorMessages.USER_CANNOT_ACCESS_ENTITY("Family"));
+
+            // siteId is present --> check user can access site
+            if (siteIdString != null) {
+                var siteId = Int32.Parse(siteIdString);
+                if (!await permissionsHelper.UserCanAccessSite(siteId, userId)) {
+                    context.ReportError(ErrorMessages.USER_CANNOT_ACCESS_ENTITY("Site"));
+                }
+            }
+
+            // familyId is present --> check user can access family
+            if (familyIdString != null) {
+                var familyId = Int32.Parse(familyIdString);
+                if(! await permissionsHelper.UserCanAccessFamily(familyId, userId)){
+                    context.ReportError(ErrorMessages.USER_CANNOT_ACCESS_ENTITY("Family"));
+                }
             }
         }
     }

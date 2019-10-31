@@ -23,14 +23,14 @@ namespace Hedwig.Security
                 if(! await permissionsHelper.UserCanAccessFamily(familyId, userId)) {
                     context.ReportError(ErrorMessages.USER_CANNOT_ACCESS_ENTITY("Family"));
                 }
-                return;
             }
 
-            // familyId is not present --> check user can access family determination
-            // by checking that they can access associated family
-            var familyDeterminationId = Int32.Parse(familyDeterminationIdString);
-            if(! await permissionsHelper.UserCanAccessFamilyForFamilyDetermination(familyDeterminationId, userId)) {
-                context.ReportError(ErrorMessages.USER_CANNOT_ACCESS_ENTITY("FamilyDetermination"));
+            // familyDeterminationId is present --> check user can access family determination
+            if(familyDeterminationIdString != null) {
+                var familyDeterminationId = Int32.Parse(familyDeterminationIdString);
+                if(! await permissionsHelper.UserCanAccessFamilyForFamilyDetermination(familyDeterminationId, userId)) {
+                    context.ReportError(ErrorMessages.USER_CANNOT_ACCESS_ENTITY("FamilyDetermination"));
+                }
             }
         }
     }
