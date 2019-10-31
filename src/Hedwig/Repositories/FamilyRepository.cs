@@ -19,10 +19,17 @@ namespace Hedwig.Repositories
 				.ToDictionaryAsync(x => x.Id);
 			return dict as IDictionary<int, Family>;
 		}
+
+		public Task<Family> GetFamilyByIdAsync(int id, DateTime? asOf = null)
+		{
+			return GetBaseQuery<Family>(asOf)
+				.FirstOrDefaultAsync(f => f.Id == id);
+		}
 	}
 
 	public interface IFamilyRepository
 	{
 		Task<IDictionary<int, Family>> GetFamiliesByIdsAsync(IEnumerable<int> ids, DateTime? asOf = null);
+		Task<Family> GetFamilyByIdAsync(int id, DateTime? asOf = null);
 	}
 }

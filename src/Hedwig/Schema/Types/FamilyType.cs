@@ -1,6 +1,7 @@
 using Hedwig.Models;
 using Hedwig.Repositories;
 using GraphQL.DataLoader;
+using Hedwig.Security;
 using GraphQL.Types;
 using System;
 
@@ -27,6 +28,23 @@ namespace Hedwig.Schema.Types
 					return loader.LoadAsync(context.Source.Id);
 				}
 			);
+		}
+	}
+
+	public class FamilyQueryType : FamilyType, IAuthorizedGraphType
+	{
+		public FamilyQueryType(IDataLoaderContextAccessor dataLoader, IFamilyDeterminationRepository determinations)
+			: base (dataLoader, determinations)
+		{ }
+
+		public AuthorizationRules Permissions(AuthorizationRules rules)
+		{
+			rules.DenyNot(Hedwig.Security.Permissions.IS_AUTHENTICATED_USER_POLICY);
+			rules.Allow(Hedwig.Security.Permissions.IS_DEVELOPER_IN_DEV_POLICY);
+			rules.Allow(Hedwig.Security.Permissions.IS_TEST_MODE_POLICY);
+			rules.Allow(Hedwig.Security.Permissions.USER_CAN_ACCESS_FAMILY_POLICY);
+			rules.Deny();
+			return rules;
 		}
 	}
 }

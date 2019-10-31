@@ -67,5 +67,35 @@ namespace Hedwig.Security
             if(child.SiteId == 0) return false;
             return await UserCanAccessSite(child.SiteId, userId);
         }
+
+        public async Task<bool> UserCanAccessFamily(int familyId, int userId)
+        {
+            var family = await _families.GetFamilyByIdAsync(familyId);
+            if(family == null) return false;
+            if(family.SiteId == 0) return false;
+            return await UserCanAccessSite(family.SiteId, userId);
+        }
+        public async Task<bool> UserCanAccessFamilyForFamilyDetermination(int familyDeterminationId, int userId)
+        {
+            var familyDetermination = await _familyDeterminations.GetFamilyDeterminationByIdAsync(familyDeterminationId);
+            if (familyDetermination == null) return false;
+            if (familyDetermination.FamilyId == 0) return false;
+            return await UserCanAccessFamily(familyDetermination.FamilyId, userId);
+        }
+        public async Task<bool> UserCanAccessEnrollment(int enrollmentId, int userId)
+        {
+            var enrollment = await _enrollments.GetEnrollmentByIdAsync(enrollmentId);
+            if(enrollment == null) return false;
+            if(enrollment.SiteId == 0) return false;
+            return await UserCanAccessSite(enrollment.SiteId, userId);
+        }
+
+        public async Task<bool> UserCanAccessEnrollmentForFunding(int fundingId, int userId)
+        {
+            var funding = await _fundings.GetFundingByIdAsync(fundingId);
+            if (funding == null) return false;
+            if (funding.EnrollmentId == 0) return false;
+            return await UserCanAccessEnrollment(funding.EnrollmentId, userId);
+        }
     }
 }
