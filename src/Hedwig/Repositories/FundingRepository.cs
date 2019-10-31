@@ -20,10 +20,17 @@ namespace Hedwig.Repositories
 				.ToListAsync();
 			return fundings.ToLookup(x => x.EnrollmentId);
 		}
+
+		public Task<Funding> GetFundingByIdAsync(int id, DateTime? asOf = null)
+		{
+			return GetBaseQuery<Funding>(asOf)
+				.FirstOrDefaultAsync(f => f.Id == id);
+		}
 	}
 
 	public interface IFundingRepository
 	{
 		Task<ILookup<int, Funding>> GetFundingsByEnrollmentIdsAsync(IEnumerable<int> enrollmentIds, DateTime? asOf = null);
+		Task<Funding> GetFundingByIdAsync(int id, DateTime? asOf = null);
 	}
 }

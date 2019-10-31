@@ -20,10 +20,17 @@ namespace Hedwig.Repositories
 
 			return determinations.ToLookup(d => d.FamilyId);
 		}
+
+		public Task<FamilyDetermination> GetFamilyDeterminationByIdAsync(int id, DateTime? asOf = null)
+		{
+			return GetBaseQuery<FamilyDetermination>(asOf)
+				.FirstOrDefaultAsync(d => d.Id == id);
+		}
 	}
 
 	public interface IFamilyDeterminationRepository
 	{
 		Task<ILookup<int, FamilyDetermination>> GetDeterminationsByFamilyIdsAsync(IEnumerable<int> familyIds, DateTime? asOf = null);
+		Task<FamilyDetermination> GetFamilyDeterminationByIdAsync(int id, DateTime? asOf = null);
 	}
 }
