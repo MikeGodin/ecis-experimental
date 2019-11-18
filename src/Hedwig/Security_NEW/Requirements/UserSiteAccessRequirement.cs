@@ -29,6 +29,8 @@ namespace Hedwig.Security_NEW
         {
             var userIdStr = user.FindFirst("sub")?.Value;
             var routeData = httpContext.GetRouteData();
+            // If request controller is 'Sites', path param for site id is 'id'
+            // else, path param is 'siteId'
             var siteIdParam = (string)routeData.Values["controller"] == "Sites" ? "id" : "siteId";
             var siteIdStr = (string)routeData.Values[siteIdParam];
             

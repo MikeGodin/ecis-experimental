@@ -29,6 +29,8 @@ namespace Hedwig.Security_NEW
         {
             var userIdStr = user.FindFirst("sub")?.Value;
             var routeData = httpContext.GetRouteData();
+            // If request controller = 'Organizations', path param for organiation id is 'id'
+            // else, path param is 'orgId'
             var orgIdParam = (string)routeData.Values["controller"] == "Organizations" ? "id" : "orgId";
             var orgIdStr = (string)routeData.Values[orgIdParam];
             if(userIdStr != null && orgIdStr != null) {
