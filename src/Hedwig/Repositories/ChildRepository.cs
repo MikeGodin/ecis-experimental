@@ -13,6 +13,57 @@ namespace Hedwig.Repositories
 	{
 		public ChildRepository(HedwigContext context) : base(context) {}
 
+		public Task<List<Child>> GetChildrenForOrganizationAsync(int organizationId)
+		{
+			return _context.Children
+				.Where(c => c.OrganizationId.HasValue 
+					&& c.OrganizationId.Value == organizationId)
+				.ToListAsync();
+		}
+
+		public Task<Child> GetChildForOrganizationByIdAsync(Guid id, int organizationId)
+		{
+			return GetBaseQuery<Child>(null)
+				.Where(c => c.Id == id
+					&& (
+						c.OrganizationId.HasValue 
+						&& c.OrganizationId.Value == organizationId
+					)
+				)
+				.FirstOrDefaultAsync();
+		}
+
+		public Task<List<Child>> GetChildrenForSiteAsync(int siteId)
+		{
+			return GetBaseQuery<Child>(null)
+				.Include(c => c.Enrollments)
+				.Where(c => c.Enrollments.Select(e => e.SiteId).Contains(siteId))
+				.ToListAsync();
+		}
+
+		public Task<Child> GetChildForSiteByIdAsync(Guid id, int siteId)
+		{
+			return GetBaseQuery<Child>(null)
+				.Include(c => c.Enrollments)
+				.Where(c => c.Id == id
+					&& c.Enrollments.Select(e => e.SiteId).Contains(siteId))
+				.FirstOrDefaultAsync();
+		}
+
+		public void AddChild(Child child) 
+		{
+			_context.Add(child);
+		}
+
+		public void UpdateChild(Child child)
+		{
+			_context.Entry(child).State = EntityState.Modified;
+		}
+
+		public Task<int> SaveChangesAsync()
+		{
+			return _context.SaveChangesAsync();
+		}
 		public async Task<IDictionary<Guid, Child>> GetChildrenByIdsAsync(IEnumerable<Guid> ids, DateTime? asOf = null)
 		{
 			var dict = await GetBaseQuery<Child>(asOf)
@@ -90,6 +141,14 @@ namespace Hedwig.Repositories
 
 	public interface IChildRepository
 	{
+		Task<List<Child>> GetChildrenForOrganizationAsync(int organizationId);
+		Task<Child> GetChildForOrganizationByIdAsync(Guid id, int organizationId);
+		Task<List<Child>> GetChildrenForSiteAsync(int siteId);
+		Task<Child> GetChildForSiteByIdAsync(Guid id, int siteId);
+		void AddChild(Child child);
+
+		void UpdateChild(Child child);
+		Task<int> SaveChangesAsync();
 		Task<IDictionary<Guid, Child>> GetChildrenByIdsAsync(IEnumerable<Guid> ids, DateTime? asOf = null);
 		Task<Child> GetChildByIdAsync(Guid id, DateTime? asOf = null);
 		Task<ILookup<int, Child>> GetChildrenByFamilyIdsAsync(IEnumerable<int> familyIds, DateTime? asOf = null);
