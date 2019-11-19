@@ -24,7 +24,7 @@ namespace HedwigTests.Controllers
 
             await controller.Get(organizationId, new string[]{});
             _children.Verify(c => c.GetChildrenForOrganizationAsync(organizationId), Times.Once);
-            _families.Verify(f => f.GetFamiliesByIdsAsync(new int[]{}, null), Times.Never);
+            _families.Verify(f => f.GetFamiliesByIdsAsync_OLD(new int[]{}, null), Times.Never);
         }
 
         [Fact]
@@ -43,7 +43,7 @@ namespace HedwigTests.Controllers
 
             await controller.Get(organizationId, new string[]{"family"});
             _children.Verify(c => c.GetChildrenForOrganizationAsync(organizationId), Times.Once);
-            _families.Verify(f => f.GetFamiliesByIdsAsync(new int[]{familyId}, null), Times.Once);
+            _families.Verify(f => f.GetFamiliesByIdsAsync_OLD(new int[]{familyId}, null), Times.Once);
 
         }
 

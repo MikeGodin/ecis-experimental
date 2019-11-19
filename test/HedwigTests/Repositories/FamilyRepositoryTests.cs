@@ -21,7 +21,7 @@ namespace HedwigTests.Repositories
                 var ids = from f in families.GetRange(1, 3)
                             select f.Id;
 
-                var res = await familyRepo.GetFamiliesByIdsAsync(ids);
+                var res = await familyRepo.GetFamiliesByIdsAsync_OLD(ids);
 
                 // Then families with those Ids are returned
                 Assert.Equal(ids.OrderBy(id => id), res.Keys.OrderBy(id => id));
@@ -46,12 +46,12 @@ namespace HedwigTests.Repositories
                 var ids = new int[] {families[0].Id};
 
                 // - Without an asOf timestamp
-                var resCurrent = await familyRepo.GetFamiliesByIdsAsync(ids);
+                var resCurrent = await familyRepo.GetFamiliesByIdsAsync_OLD(ids);
                 // - Then the family including the updated caseNumber is returned
                 Assert.Equal(address, resCurrent.First().Value.AddressLine1);
 
                 // - With an asOf timestamp that predates the update
-                var resAsOf = await familyRepo.GetFamiliesByIdsAsync(ids, asOf);
+                var resAsOf = await familyRepo.GetFamiliesByIdsAsync_OLD(ids, asOf);
                 // - Then the family without the caseNumber is returned
                 Assert.Null(resAsOf.First().Value.AddressLine1);
             }

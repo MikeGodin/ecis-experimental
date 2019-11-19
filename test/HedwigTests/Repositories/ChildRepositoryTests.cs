@@ -23,7 +23,7 @@ namespace HedwigTests.Repositories
 				var ids = from c in children.GetRange(1, 3)
 									select c.Id;
 
-				var res = await childRepo.GetChildrenByIdsAsync(ids);
+				var res = await childRepo.GetChildrenByIdsAsync_OLD(ids);
 
 				// Then children with those Ids are returned
 				Assert.Equal(ids.OrderBy(id => id), res.Keys.OrderBy(id => id));

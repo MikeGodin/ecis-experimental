@@ -12,6 +12,23 @@ namespace Hedwig.Repositories
 	{
 		public EnrollmentRepository(HedwigContext context) : base(context) {}
 
+		public Task<List<Enrollment>> GetEnrollmentsForSiteAsync(
+			int siteId,
+			bool includeFundings = false,
+			DateTime? from = null,
+			DateTime? to = null
+		)
+		{
+			var enrollments = _context.Enrollments
+				.Where(e => e.SiteId == siteId)
+				.FilterByDates(from, to);
+
+			if(includeFundings) {
+				enrollments.Include(e => e.Fundings);
+			}
+
+			return enrollments.ToListAsync();
+		}
 		public async Task<ILookup<int, Enrollment>> GetEnrollmentsBySiteIdsAsync(
 			IEnumerable<int> siteIds,
 			DateTime? asOf = null,
@@ -62,6 +79,12 @@ namespace Hedwig.Repositories
 
 	public interface IEnrollmentRepository
 	{
+		Task<List<Enrollment>> GetEnrollmentsForSiteAsync(
+			int siteId,
+			bool includeFundings = false,
+			DateTime? from = null,
+			DateTime? to = null
+		);
 		Task<ILookup<int, Enrollment>> GetEnrollmentsBySiteIdsAsync(
 			IEnumerable<int> siteIds,
 			DateTime? asOf = null,

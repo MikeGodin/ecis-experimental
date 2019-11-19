@@ -34,7 +34,7 @@ namespace Hedwig.Controllers
             var children = await _children.GetChildrenForOrganizationAsync(orgId);
 
             if(include.Contains("family")) {
-                await _families.GetFamiliesByIdsAsync(
+                await _families.GetFamiliesByIdsAsync_OLD(
                     children.Where(c => c.FamilyId != null).Select(c => c.FamilyId.Value).ToArray()
                 );
             }

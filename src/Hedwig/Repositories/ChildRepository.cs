@@ -64,12 +64,19 @@ namespace Hedwig.Repositories
 		{
 			return _context.SaveChangesAsync();
 		}
-		public async Task<IDictionary<Guid, Child>> GetChildrenByIdsAsync(IEnumerable<Guid> ids, DateTime? asOf = null)
+		public async Task<IDictionary<Guid, Child>> GetChildrenByIdsAsync_OLD(IEnumerable<Guid> ids, DateTime? asOf = null)
 		{
 			var dict = await GetBaseQuery<Child>(asOf)
 				.Where(c => ids.Contains(c.Id))
 				.ToDictionaryAsync(x => x.Id);
 			return dict as IDictionary<Guid, Child>;
+		}
+
+		public Task<List<Child>> GetChildrenByIdsAsync(IEnumerable<Guid> ids)
+		{
+			return _context.Children
+				.Where(c => ids.Contains(c.Id))
+				.ToListAsync();
 		}
 
 		public async Task<Child> GetChildByIdAsync(Guid id, DateTime? asOf = null)
@@ -149,7 +156,8 @@ namespace Hedwig.Repositories
 
 		void UpdateChild(Child child);
 		Task<int> SaveChangesAsync();
-		Task<IDictionary<Guid, Child>> GetChildrenByIdsAsync(IEnumerable<Guid> ids, DateTime? asOf = null);
+		Task<IDictionary<Guid, Child>> GetChildrenByIdsAsync_OLD(IEnumerable<Guid> ids, DateTime? asOf = null);
+		Task<List<Child>> GetChildrenByIdsAsync(IEnumerable<Guid> ids);
 		Task<Child> GetChildByIdAsync(Guid id, DateTime? asOf = null);
 		Task<ILookup<int, Child>> GetChildrenByFamilyIdsAsync(IEnumerable<int> familyIds, DateTime? asOf = null);
 		Child UpdateFamily(Child child, Family family);

@@ -12,7 +12,17 @@ namespace Hedwig.Repositories
 	{
 		public FamilyRepository(HedwigContext context) : base(context) {}
 
-		public async Task<IDictionary<int, Family>> GetFamiliesByIdsAsync(IEnumerable<int> ids, DateTime? asOf = null)
+		public Task<List<Family>> GetFamiliesByIdsAsync(IEnumerable<int> ids, bool includeDeterminations = false)
+		{
+			var families = _context.Families
+				.Where(f => ids.Contains(f.Id));
+			if(includeDeterminations) {
+				families.Include(f => f.Determinations);
+			}
+
+			return families.ToListAsync();
+		}
+		public async Task<IDictionary<int, Family>> GetFamiliesByIdsAsync_OLD(IEnumerable<int> ids, DateTime? asOf = null)
 		{
 			var dict = await GetBaseQuery<Family>(asOf)
 				.Where(f => ids.Contains(f.Id))
@@ -50,7 +60,8 @@ namespace Hedwig.Repositories
 
 	public interface IFamilyRepository
 	{
-		Task<IDictionary<int, Family>> GetFamiliesByIdsAsync(IEnumerable<int> ids, DateTime? asOf = null);
+		Task<IDictionary<int, Family>> GetFamiliesByIdsAsync_OLD(IEnumerable<int> ids, DateTime? asOf = null);
+		Task<List<Family>> GetFamiliesByIdsAsync(IEnumerable<int> ids, bool includeDeterminations = false);
 		Task<Family> GetFamilyByIdAsync(int id, DateTime? asOf = null);
 		Family CreateFamily(
 			string addressLine1 = null,
