@@ -13,162 +13,116 @@ namespace HedwigTests.Controllers
 {
     public class ChildrenControllerTests
     {
-        [Fact]
-        public async Task Get_GetsChildrenForOrganization_WithoutFamily()
+        [Theory]
+        [InlineData(new string[]{}, false, false)]
+        [InlineData(new string[]{"family"}, true, false)]
+        [InlineData(new string[]{"family", "determinations"}, true, true)]
+        [InlineData(new string[]{"determinations"}, false, false)]
+        public async Task Get_IncludeEntities_GetsChildrenForOrganization_WithEntities(
+            string[] include,
+            bool shouldGetFamilies,
+            bool includeDeterminations
+        )
         {
             var organizationId = 1;
-            var _children = new Mock<IChildRepository>();
-            var _families = new Mock<IFamilyRepository>();
-
-            var controller = new ChildrenController(_children.Object, _families.Object);
-
-            await controller.Get(organizationId, new string[]{});
-            _children.Verify(c => c.GetChildrenForOrganizationAsync(organizationId), Times.Once);
-            _families.Verify(f => f.GetFamiliesByIdsAsync_OLD(new int[]{}, null), Times.Never);
-        }
-
-        [Fact]
-        public async Task Get_IncludesFamily_GetsChildrenForOrganization_WithFamily()
-        {
-            var organizationId = 1;
-            var familyId = 1;
 
             var _children = new Mock<IChildRepository>();
             _children.Setup(c => c.GetChildrenForOrganizationAsync(organizationId))
-                .Returns(Task.FromResult(new List<Child>{new Child{FamilyId = familyId}}));
+                .Returns(Task.FromResult(new List<Child>{new Child{}}));
 
             var _families = new Mock<IFamilyRepository>();
 
             var controller = new ChildrenController(_children.Object, _families.Object);
 
-            await controller.Get(organizationId, new string[]{"family"});
-            _children.Verify(c => c.GetChildrenForOrganizationAsync(organizationId), Times.Once);
-            _families.Verify(f => f.GetFamiliesByIdsAsync_OLD(new int[]{familyId}, null), Times.Once);
+            await controller.Get(organizationId, include);
+            _children.Verify(c => c.GetChildrenForOrganizationAsync(organizationId), Times.Once());
+            var times = shouldGetFamilies ? Times.Once() : Times.Never();
+            _families.Verify(f => f.GetFamiliesByIdsAsync(It.IsAny<IEnumerable<int>>(), includeDeterminations), times);
 
         }
 
-        [Fact]
-        public async Task Get_Id_GetsChildForOrganization_WithoutFamily()
+        [Theory]
+        [InlineData(new string[]{}, false, false)]
+        [InlineData(new string[]{"family"}, true, false)]
+        [InlineData(new string[]{"family", "determinations"}, true, true)]
+        [InlineData(new string[]{"determinations"}, false, false)]
+        public async Task Get_Id_IncludeEntities_GetsChildForOrganization_WithEntities(
+            string[] include,
+            bool shouldGetFamilies,
+            bool includeDeterminations
+        )
         {
             var organizationId = 1;
-            var childId = Guid.NewGuid();
+
+            var _children = new Mock<IChildRepository>();
+            _children.Setup(c => c.GetChildForOrganizationByIdAsync(It.IsAny<Guid>(), organizationId))
+                .Returns(Task.FromResult(new Child{FamilyId = 1}));
+
+            var _families = new Mock<IFamilyRepository>();
+
+            var controller = new ChildrenController(_children.Object, _families.Object);
+
+            await controller.Get(Guid.NewGuid(), organizationId, include);
+            _children.Verify(c => c.GetChildForOrganizationByIdAsync(It.IsAny<Guid>(), organizationId), Times.Once);
+            var times = shouldGetFamilies ? Times.Once() : Times.Never();
+            _families.Verify(f => f.GetFamilyByIdAsync(It.IsAny<int>(), includeDeterminations), times);
+        }
+
+        [Theory]
+        [InlineData(false, true, typeof(CreatedAtActionResult))]
+        [InlineData(true, false, typeof(BadRequestResult))]
+        public async Task Post_AddsChild_IfValid(
+            bool hasId,
+            bool shouldAddChild,
+            Type resultType
+        )
+        {
+            var organizationId = 1;
 
             var _children = new Mock<IChildRepository>();
             var _families = new Mock<IFamilyRepository>();
 
             var controller = new ChildrenController(_children.Object, _families.Object);
 
-            await controller.Get(childId, organizationId, new string[]{});
-            _children.Verify(c => c.GetChildForOrganizationByIdAsync(childId, organizationId), Times.Once);
-            _families.Verify(f => f.GetFamilyByIdAsync(0, null), Times.Never);
-        }
-
-        [Fact]
-        public async Task GetId_IncludesFamily_GetsChildForOrganization_WithFamily()
-        {
-            var organizationId = 1;
-            var familyId = 1;
-            var childId = Guid.NewGuid();
-
-            var _children = new Mock<IChildRepository>();
-            _children.Setup(c => c.GetChildForOrganizationByIdAsync(childId, organizationId))
-                .Returns(Task.FromResult(new Child{FamilyId = familyId}));
-
-            var _families = new Mock<IFamilyRepository>();
-
-            var controller = new ChildrenController(_children.Object, _families.Object);
-
-            await controller.Get(childId, organizationId, new string[]{"family"});
-            _children.Verify(c => c.GetChildForOrganizationByIdAsync(childId, organizationId), Times.Once);
-            _families.Verify(f => f.GetFamilyByIdAsync(familyId, null), Times.Once);
-        }
-
-        [Fact]
-        public async Task Post_AddsChild_ReturnsCreatedAtAction()
-        {
-            var organizationId = 1;
             var child = new Child();
-
-            var _children = new Mock<IChildRepository>();
-            var _families = new Mock<IFamilyRepository>();
-
-            var controller = new ChildrenController(_children.Object, _families.Object);
+            if(hasId) child.Id = Guid.NewGuid();
 
             var result = await controller.Post(organizationId, child);
-            _children.Verify(c => c.AddChild(child), Times.Once);
-            Assert.IsType<CreatedAtActionResult>(result.Result);
+            var times = shouldAddChild ? Times.Once() : Times.Never();
+            _children.Verify(c => c.AddChild(It.IsAny<Child>()), times);
+            Assert.IsType(resultType, result.Result);
         }
 
-        [Fact]
-        public async Task Post_DoesNotAddChild_ReturnsBadRequest_WhenChildHasId()
+        [Theory]
+        [InlineData(true, false, true, typeof(NoContentResult))]
+        [InlineData(false, false, false, typeof(BadRequestResult))]
+        [InlineData(true, true, true, typeof(NotFoundResult))]
+        public async Task Put_UpdatesChild_IfValid_AndExists(
+            bool idsMatch,
+            bool shouldNotFind,
+            bool shouldUpdateChild,
+            Type resultType
+        )
         {
             var organizationId = 1;
-            var child = new Child{
-                Id = Guid.NewGuid()
-            };
 
             var _children = new Mock<IChildRepository>();
-            var _families = new Mock<IFamilyRepository>();
-
-            var controller = new ChildrenController(_children.Object, _families.Object);
-            
-            var result = await controller.Post(organizationId, child);
-            _children.Verify(c => c.AddChild(child), Times.Never);
-            Assert.IsType<BadRequestResult>(result.Result);
-        }
-
-        [Fact]
-        public async Task Put_UpdatesChild_ReturnsNoContent()
-        {
-            var organizationId = 1;
-            var childId = Guid.NewGuid();
-            var child = new Child{ Id = childId };
-
-            var _children = new Mock<IChildRepository>();
+            if(shouldNotFind) {
+                _children.Setup(c => c.SaveChangesAsync())
+                    .Throws(new DbUpdateConcurrencyException());
+            }
             var _families = new Mock<IFamilyRepository>();
 
             var controller = new ChildrenController(_children.Object, _families.Object);
 
-            var result = await controller.Put(childId, organizationId, child);
-            _children.Verify(c => c.UpdateChild(child), Times.Once);
-            Assert.IsType<NoContentResult>(result.Result);
+            var pathId = Guid.NewGuid();
+            var child = new Child();
+            if(idsMatch) child.Id = pathId;
+
+            var result = await controller.Put(pathId, organizationId, child);
+            var times = shouldUpdateChild ? Times.Once() : Times.Never();
+            _children.Verify(c => c.UpdateChild(It.IsAny<Child>()), times);
+            Assert.IsType(resultType, result.Result);
         }
-
-        [Fact]
-        public async Task Put_DoesNotUpdateChild_ReturnsBadRequest_WhenIdDoesNotMatch()
-        {
-            var organizationId = 1;
-            var childId = Guid.NewGuid();
-            var child = new Child { Id = Guid.NewGuid() };
-
-            var _children = new Mock<IChildRepository>();
-            var _families = new Mock<IFamilyRepository>();
-
-            var controller = new ChildrenController(_children.Object, _families.Object);
-
-            var result = await controller.Put(childId, organizationId, child);
-            _children.Verify(c => c.UpdateChild(child), Times.Never);
-            Assert.IsType<BadRequestResult>(result.Result);
-        }
-
-        [Fact]
-        public async Task Put_DoesNotUpdateChild_ReturnsNotFound_WhenIdDoesNotExist()
-        {
-            var organizationId = 1;
-            var childId = Guid.NewGuid();
-            var child = new Child { Id = Guid.NewGuid() };
-
-            var _children = new Mock<IChildRepository>();
-            _children.Setup(c => c.SaveChangesAsync())
-                .Throws(new DbUpdateConcurrencyException());
-            var _families = new Mock<IFamilyRepository>();
-
-            var controller = new ChildrenController(_children.Object, _families.Object);
-
-            var result = await controller.Put(childId, organizationId, child);
-            _children.Verify(c => c.UpdateChild(child), Times.Never);
-            Assert.IsType<BadRequestResult>(result.Result);
-        }
-
     }
 }
