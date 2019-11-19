@@ -64,7 +64,7 @@ namespace HedwigTests.Repositories
                 var family = FamilyHelper.CreateFamily(context);
 
                 var familyRepo = new FamilyRepository(context);
-                var res = await familyRepo.GetFamilyByIdAsync(family.Id);
+                var res = await familyRepo.GetFamilyByIdAsync_OLD(family.Id);
 
                 Assert.Equal(family.Id, res.Id);
             }

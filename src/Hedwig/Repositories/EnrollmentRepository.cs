@@ -29,6 +29,39 @@ namespace Hedwig.Repositories
 
 			return enrollments.ToListAsync();
 		}
+
+		public Task<Enrollment> GetEnrollmentForSiteAsync(
+			int id,
+			int siteId,
+			bool includeFundings = false
+		)
+		{
+			var enrollment = _context.Enrollments
+				.Where(e => e.SiteId == siteId
+					&& e.Id == id);
+
+			if(includeFundings) {
+				enrollment.Include(e => e.Fundings);
+			}
+
+			return enrollment.FirstOrDefaultAsync();
+		}
+
+		public void AddEnrollment(Enrollment enrollment)
+		{
+			_context.Add(enrollment);
+		}
+
+		public void UpdateEnrollment(Enrollment enrollment)
+		{
+			_context.Entry(enrollment).State = EntityState.Modified;
+		}
+
+		public Task SaveChangesAsync()
+		{
+			return _context.SaveChangesAsync();
+		}
+
 		public async Task<ILookup<int, Enrollment>> GetEnrollmentsBySiteIdsAsync(
 			IEnumerable<int> siteIds,
 			DateTime? asOf = null,
@@ -85,6 +118,16 @@ namespace Hedwig.Repositories
 			DateTime? from = null,
 			DateTime? to = null
 		);
+		Task<Enrollment> GetEnrollmentForSiteAsync(
+			int id,
+			int siteId,
+			bool includeFundings = false
+		);
+
+		void AddEnrollment(Enrollment enrollment);
+		void UpdateEnrollment(Enrollment enrollment);
+		Task SaveChangesAsync();
+
 		Task<ILookup<int, Enrollment>> GetEnrollmentsBySiteIdsAsync(
 			IEnumerable<int> siteIds,
 			DateTime? asOf = null,

@@ -11,7 +11,7 @@ using Hedwig.Security_NEW;
 
 namespace Hedwig.Controllers
 {
-    [Route("api/sites/{siteId}/[controller]")]
+    [Route("api/organizations/{orgId:int}/sites/{siteId}/[controller]")]
     [ApiController]
     [Authorize(Policy = UserSiteAccessRequirement.NAME)]
     public class EnrollmentsController : ControllerBase
@@ -32,18 +32,15 @@ namespace Hedwig.Controllers
 
         [HttpGet]
         public async Task<ActionResult<List<Enrollment>>> Get(
+            int orgId,
             int siteId,
-            [FromQuery(Name="include[]")] string[] include,
-            [FromQuery(Name="from")] DateTime? from,
-            [FromQuery(Name="to")] DateTime? to
+            [FromQuery(Name="include[]")] string[] include
         )
         {
-            var includeFundings = include.Contains("funding");
+            var includeFundings = include.Contains("fundings");
             var enrollments = await _enrollments.GetEnrollmentsForSiteAsync(
                 siteId,
-                includeFundings,
-                from,
-                to
+                includeFundings
             );
 
             if(include.Contains("child")) {
@@ -53,7 +50,7 @@ namespace Hedwig.Controllers
 
                     var includeDeterminations = include.Contains("determinations");
                     await _families.GetFamiliesByIdsAsync(
-                        children.Where(c => c.FamilyId.HasValue).Select(c => c.FamilyId.Value).ToArray(),
+                        children.Where(c => c.FamilyId.HasValue).Select(c => c.FamilyId.Value),
                         includeDeterminations
                     );
                 }
@@ -63,15 +60,70 @@ namespace Hedwig.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<List<Enrollment>>> Get(
+        public async Task<ActionResult<Enrollment>> Get(
             int id,
+            int orgId,
             int siteId,
             [FromQuery(Name="include[]")] string[] include
         )
         {
-            void includeFundings = include.Contains("funding");
-            var enrollments = await _enrollments.GetEnrollm
+            var includeFundings = include.Contains("fundings");
+            var enrollment = await _enrollments.GetEnrollmentForSiteAsync(id, siteId, includeFundings);
 
+            if (include.Contains("child")) {
+                var child = await _children.GetChildByIdAsync(enrollment.ChildId);
+
+                if (include.Contains("family") && child.FamilyId.HasValue) {
+                    var includeDeterminations = include.Contains("determinations");
+                    await _families.GetFamilyByIdAsync(child.FamilyId.Value, includeDeterminations);
+                }
+            }
+
+            return enrollment;
+        }
+
+        [HttpPost]
+        public async Task<ActionResult<Enrollment>> Post(
+            int orgId,
+            int siteId,
+            Enrollment enrollment
+        )
+        {
+            // TODO check/enforce that if a child object is submitted, child has orgId = orgId
+            // TODO check/enforce that if child.Family object is submitted, family has orgId = orgId
+            // Q? should we required the correct orgId, or will we also allow orgId = 0/null, and we'll update here?
+
+            if(enrollment.Id != 0) return BadRequest();
+
+            _enrollments.AddEnrollment(enrollment);
+            await _enrollments.SaveChangesAsync();
+
+            return CreatedAtAction(
+                nameof(Get),
+                new { id = enrollment.Id, orgId = orgId, siteId = siteId },
+                enrollment
+            );
+        }
+
+        [HttpPut("{id}")]
+        public async Task<ActionResult<Enrollment>> Put(
+            int id,
+            int orgId,
+            int siteId,
+            Enrollment enrollment
+        )
+        {
+            if (enrollment.Id != id) return BadRequest();
+
+            try {
+                _enrollments.UpdateEnrollment(enrollment);
+                await _enrollments.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException) {
+                return NotFound();
+            }
+
+            return NoContent();
         }
     }
 }
