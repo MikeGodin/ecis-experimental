@@ -17,7 +17,7 @@ namespace Hedwig.Repositories
 			var families = _context.Families
 				.Where(f => ids.Contains(f.Id));
 			if(includeDeterminations) {
-				families.Include(f => f.Determinations);
+				families = families.Include(f => f.Determinations);
 			}
 
 			return families.ToListAsync();
@@ -36,7 +36,7 @@ namespace Hedwig.Repositories
 				.Where(f => f.Id == id);
 
 			if (includeDeterminations) {
-				family.Include(f => f.Determinations);
+				family = family.Include(f => f.Determinations);
 			}
 
 			return family.FirstOrDefaultAsync();

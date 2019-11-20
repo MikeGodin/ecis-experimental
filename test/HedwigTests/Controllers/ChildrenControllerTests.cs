@@ -55,7 +55,7 @@ namespace HedwigTests.Controllers
             var organizationId = 1;
 
             var _children = new Mock<IChildRepository>();
-            _children.Setup(c => c.GetChildForOrganizationByIdAsync(It.IsAny<Guid>(), organizationId))
+            _children.Setup(c => c.GetChildForOrganizationAsync(It.IsAny<Guid>(), organizationId))
                 .Returns(Task.FromResult(new Child{FamilyId = 1}));
 
             var _families = new Mock<IFamilyRepository>();
@@ -63,7 +63,7 @@ namespace HedwigTests.Controllers
             var controller = new ChildrenController(_children.Object, _families.Object);
 
             await controller.Get(Guid.NewGuid(), organizationId, include);
-            _children.Verify(c => c.GetChildForOrganizationByIdAsync(It.IsAny<Guid>(), organizationId), Times.Once);
+            _children.Verify(c => c.GetChildForOrganizationAsync(It.IsAny<Guid>(), organizationId), Times.Once);
             var times = shouldGetFamilies ? Times.Once() : Times.Never();
             _families.Verify(f => f.GetFamilyByIdAsync(It.IsAny<int>(), includeDeterminations), times);
         }

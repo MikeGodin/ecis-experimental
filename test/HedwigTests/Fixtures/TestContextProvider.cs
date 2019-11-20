@@ -16,22 +16,20 @@ namespace HedwigTests.Fixtures
 
 		public TestContextProvider(bool retainObjects = false)
 		{
-			var services = new ServiceCollection()
-				.AddEntityFrameworkSqlServer();
-
-			if (TestEnvironmentFlags.ShouldLogSQL()) {
-				services.AddLogging(configure => configure.AddConsole());
-			}
 			
-			var options = new DbContextOptionsBuilder<HedwigContext>()
+			var loggerFactory = LoggerFactory.Create(builder => {builder.AddConsole();});
+			var optionsBuilder = new DbContextOptionsBuilder<HedwigContext>()
 				.UseSqlServer(Environment.GetEnvironmentVariable("SQLCONNSTR_HEDWIG"))
-				.EnableSensitiveDataLogging()
-				.UseInternalServiceProvider(services.BuildServiceProvider())
-				.Options;
+				.EnableSensitiveDataLogging();
+
+			if(TestEnvironmentFlags.ShouldLogSQL()) {
+                optionsBuilder.UseLoggerFactory(loggerFactory);
+			}
 
            	HttpContextAccessor = new TestHttpContextAccessorProvider().HttpContextAccessor;
-			Context = new TestHedwigContext(options, HttpContextAccessor, retainObjects);
+			Context = new TestHedwigContext(optionsBuilder.Options, HttpContextAccessor, retainObjects);
 		}
+
 		public void Dispose()
 		{
 			Context?.Dispose();

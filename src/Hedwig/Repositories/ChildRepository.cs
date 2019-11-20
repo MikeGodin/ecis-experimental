@@ -21,7 +21,7 @@ namespace Hedwig.Repositories
 				.ToListAsync();
 		}
 
-		public Task<Child> GetChildForOrganizationByIdAsync(Guid id, int organizationId)
+		public Task<Child> GetChildForOrganizationAsync(Guid id, int organizationId)
 		{
 			return GetBaseQuery<Child>(null)
 				.Where(c => c.Id == id
@@ -30,23 +30,6 @@ namespace Hedwig.Repositories
 						&& c.OrganizationId.Value == organizationId
 					)
 				)
-				.FirstOrDefaultAsync();
-		}
-
-		public Task<List<Child>> GetChildrenForSiteAsync(int siteId)
-		{
-			return GetBaseQuery<Child>(null)
-				.Include(c => c.Enrollments)
-				.Where(c => c.Enrollments.Select(e => e.SiteId).Contains(siteId))
-				.ToListAsync();
-		}
-
-		public Task<Child> GetChildForSiteByIdAsync(Guid id, int siteId)
-		{
-			return GetBaseQuery<Child>(null)
-				.Include(c => c.Enrollments)
-				.Where(c => c.Id == id
-					&& c.Enrollments.Select(e => e.SiteId).Contains(siteId))
 				.FirstOrDefaultAsync();
 		}
 
@@ -149,9 +132,7 @@ namespace Hedwig.Repositories
 	public interface IChildRepository
 	{
 		Task<List<Child>> GetChildrenForOrganizationAsync(int organizationId);
-		Task<Child> GetChildForOrganizationByIdAsync(Guid id, int organizationId);
-		Task<List<Child>> GetChildrenForSiteAsync(int siteId);
-		Task<Child> GetChildForSiteByIdAsync(Guid id, int siteId);
+		Task<Child> GetChildForOrganizationAsync(Guid id, int organizationId);
 		void AddChild(Child child);
 
 		void UpdateChild(Child child);

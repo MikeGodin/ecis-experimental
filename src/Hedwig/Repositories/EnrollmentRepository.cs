@@ -24,7 +24,7 @@ namespace Hedwig.Repositories
 				.FilterByDates(from, to);
 
 			if(includeFundings) {
-				enrollments.Include(e => e.Fundings);
+				enrollments = enrollments.Include(e => e.Fundings);
 			}
 
 			return enrollments.ToListAsync();
@@ -41,7 +41,7 @@ namespace Hedwig.Repositories
 					&& e.Id == id);
 
 			if(includeFundings) {
-				enrollment.Include(e => e.Fundings);
+				enrollment = enrollment.Include(e => e.Fundings);
 			}
 
 			return enrollment.FirstOrDefaultAsync();

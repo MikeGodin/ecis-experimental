@@ -1,8 +1,11 @@
 using System;
 using System.Linq;
+using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using Xunit;
 using Hedwig.Repositories;
+using Hedwig.Models;
 using HedwigTests.Helpers;
 using HedwigTests.Fixtures;
 
@@ -10,6 +13,79 @@ namespace HedwigTests.Repositories
 {
 	public class EnrollmentRepositoryTests
 	{
+		[Theory]
+		[InlineData(true)]
+		[InlineData(false)]
+		public async Task GetEnrollmentsForSite(bool includeFundings)
+		{
+			List<int> enrollmentIds;
+			int siteId;
+			using (var context = new TestContextProvider(retainObjects:true).Context) {
+				var site = SiteHelper.CreateSite(context);
+				var enrollments = EnrollmentHelper.CreateEnrollments(context, 3, site: site);
+				enrollments.ForEach(e => FundingHelper.CreateFunding(context, enrollment: e));
+				enrollmentIds = enrollments.Select(e => e.Id).ToList();
+				siteId = site.Id;
+			}
+
+			using (var context = new TestContextProvider().Context) {
+				var enrollmentRepo = new EnrollmentRepository(context);
+				var res = await enrollmentRepo.GetEnrollmentsForSiteAsync(siteId, includeFundings);
+
+				Assert.Equal(enrollmentIds.OrderBy(id => id), res.Select(e => e.Id).OrderBy(id => id));
+				Assert.Equal(includeFundings, res.TrueForAll(e => e.Fundings != null));
+			}
+		}
+
+		[Theory]
+		[InlineData(true)]
+		[InlineData(false)]
+		public async Task GetEnrollmentForSite(bool includeFundings)
+		{
+			int enrollmentId;
+			int siteId;
+			using (var context = new TestContextProvider(retainObjects:true).Context) {
+				var site = SiteHelper.CreateSite(context);
+				var enrollment = EnrollmentHelper.CreateEnrollment(context, site: site);
+				enrollmentId = enrollment.Id;
+				siteId = site.Id;
+			}
+
+			using (var context = new TestContextProvider().Context) {
+				var enrollmentRepo = new EnrollmentRepository(context);
+				var res = await enrollmentRepo.GetEnrollmentForSiteAsync(enrollmentId, siteId, includeFundings);
+
+				Assert.Equal(enrollmentId, res.Id);
+				Assert.Equal(includeFundings, res.Fundings != null);
+			}
+		}
+		
+		[Fact]
+		public void AddEnrollment()
+		{
+			using (var context = new TestContextProvider().Context) {
+				var enrollment = new Enrollment();
+
+				var enrollmentRepo = new EnrollmentRepository(context);
+				enrollmentRepo.AddEnrollment(enrollment);
+
+				Assert.Equal(EntityState.Added, context.Entry(enrollment).State);
+			}
+		}
+
+		[Fact]
+		public void UpdateEnrollment()
+		{
+			using (var context = new TestContextProvider().Context) {
+				var enrollment = new Enrollment();
+
+				var enrollmentRepo = new EnrollmentRepository(context);
+				enrollmentRepo.UpdateEnrollment(enrollment);
+
+				Assert.Equal(EntityState.Modified, context.Entry(enrollment).State);
+			}
+		}
+
 		[Fact]
 		public async Task Get_Enrollment_By_Id()
 		{

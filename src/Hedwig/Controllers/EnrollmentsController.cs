@@ -50,7 +50,7 @@ namespace Hedwig.Controllers
 
                     var includeDeterminations = include.Contains("determinations");
                     await _families.GetFamiliesByIdsAsync(
-                        children.Where(c => c.FamilyId.HasValue).Select(c => c.FamilyId.Value),
+                        children.Where(c => c.FamilyId.HasValue).Select(c => c.FamilyId.Value).ToList(),
                         includeDeterminations
                     );
                 }

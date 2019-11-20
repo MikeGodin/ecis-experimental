@@ -34,9 +34,9 @@ namespace Hedwig.Controllers
             var children = await _children.GetChildrenForOrganizationAsync(orgId);
 
             if(include.Contains("family")) {
-                var includeDeterminations = include.Contains("determination");
+                var includeDeterminations = include.Contains("determinations");
                 await _families.GetFamiliesByIdsAsync(
-                    children.Where(c => c.FamilyId != null).Select(c => c.FamilyId.Value),
+                    children.Where(c => c.FamilyId != null).Select(c => c.FamilyId.Value).ToList(),
                     includeDeterminations
                 );
             }
@@ -51,10 +51,10 @@ namespace Hedwig.Controllers
             [FromQuery(Name="include[]")] string[] include
         )
         {
-            var child = await _children.GetChildForOrganizationByIdAsync(id, orgId);
+            var child = await _children.GetChildForOrganizationAsync(id, orgId);
 
             if(include.Contains("family") && child.FamilyId.HasValue) {
-                var includeDeterminations = include.Contains("determination");
+                var includeDeterminations = include.Contains("determinations");
                 await _families.GetFamilyByIdAsync(child.FamilyId.Value, includeDeterminations);
             }
 

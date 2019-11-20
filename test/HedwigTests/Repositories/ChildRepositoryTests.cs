@@ -1,6 +1,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
+using Microsoft.EntityFrameworkCore;
 using Hedwig.Repositories;
 using HedwigTests.Helpers;
 using HedwigTests.Fixtures;
@@ -10,6 +11,69 @@ namespace HedwigTests.Repositories
 {
 	public class ChildRepositoryTests
 	{
+
+		[Fact]
+		public async Task GetChildrenForOrganization()
+		{
+			using (var context = new TestContextProvider().Context)
+			{
+				var organization = OrganizationHelper.CreateOrganization(context);
+				var children = ChildHelper.CreateChildren(context, 3, organization: organization);
+
+				var childRepo = new ChildRepository(context);
+				var res = await childRepo.GetChildrenForOrganizationAsync(organization.Id);
+
+				Assert.Equal(children, res);
+			}
+		}
+
+		[Theory]
+		[InlineData(true)]
+		[InlineData(false)]
+		public async Task GetChildForOrganization(bool childBelongsToOrganization)
+		{
+			using (var context = new TestContextProvider().Context)
+			{
+				var organization = OrganizationHelper.CreateOrganization(context);
+				var child = ChildHelper.CreateChild(context);
+				if(childBelongsToOrganization) {
+					child.OrganizationId = organization.Id;
+					context.SaveChanges();
+				}
+
+				var childRepo = new ChildRepository(context);
+				var res = await childRepo.GetChildForOrganizationAsync(child.Id, organization.Id);
+				Assert.Equal(childBelongsToOrganization, res != null);
+			}
+		}
+
+		[Fact]
+		public void AddChild()
+		{
+			using (var context = new TestContextProvider().Context) {
+				var child = new Child();
+
+				var childRepo = new ChildRepository(context);
+				childRepo.UpdateChild(child);
+
+				Assert.Equal(EntityState.Added, context.Entry(child).State);
+			}
+		}
+
+		[Fact]
+		public void updateChild()
+		{
+			using (var context = new TestContextProvider().Context) {
+				var child = new Child();
+
+				var childRepo = new ChildRepository(context);
+				childRepo.UpdateChild(child);
+
+				Assert.Equal(EntityState.Modified, context.Entry(child).State);
+
+			}
+		}
+
 		[Fact]
 		public async Task Get_Children_By_Ids()
 		{

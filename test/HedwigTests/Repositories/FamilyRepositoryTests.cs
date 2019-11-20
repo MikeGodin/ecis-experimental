@@ -1,5 +1,6 @@
 using System.Threading.Tasks;
 using System.Linq;
+using System.Collections.Generic;
 using Xunit;
 using Hedwig.Repositories;
 using HedwigTests.Helpers;
@@ -9,8 +10,55 @@ namespace HedwigTests.Repositories
 {
     public class FamilyRepositoryTests
     {
+
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public async Task GetFamiliesByIds(bool includeDeterminations)
+        {
+            List<int> familyIds;
+            using (var context = new TestContextProvider(retainObjects:true).Context) {
+                var families = FamilyHelper.CreateFamilies(context, 5);
+                families.ForEach(f => FamilyDeterminationHelper.CreateDetermination(context, family: f));
+                familyIds = families.Select(f => f.Id).ToList();
+            }
+
+            using (var context = new TestContextProvider().Context) {
+                // When the repository is queried for a subset of Ids
+                var familyRepo = new FamilyRepository(context);
+
+                var res = await familyRepo.GetFamiliesByIdsAsync(familyIds, includeDeterminations);
+
+                // Then families with those Ids are returned
+                Assert.Equal(familyIds.OrderBy(id => id), res.Select(f => f.Id).OrderBy(id => id));
+                Assert.Equal(includeDeterminations, res.TrueForAll(f => f.Determinations != null));
+            }
+        }
+
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public async Task GetFamilyById(bool includeDeterminations)
+        {
+            int familyId;
+            using (var context = new TestContextProvider(retainObjects:true).Context)
+            {
+                var family = FamilyHelper.CreateFamily(context);
+                FamilyDeterminationHelper.CreateDetermination(context, family: family);
+                familyId = family.Id;
+            }
+
+            using (var context = new TestContextProvider().Context)
+            {
+                var familyRepo = new FamilyRepository(context);
+                var res = await familyRepo.GetFamilyByIdAsync(familyId, includeDeterminations);
+
+                Assert.Equal(familyId, res.Id);
+                Assert.Equal(includeDeterminations, res.Determinations != null);
+            }
+        }
         [Fact]
-        public async Task Get_Families_By_Ids()
+        public async Task Get_Families_By_Ids_OLD()
         {
             using (var context = new TestContextProvider().Context){
                 // If 5 families with auto-incrementing Ids exist
@@ -58,7 +106,7 @@ namespace HedwigTests.Repositories
         }
 
         [Fact]
-        public async Task Get_Family_By_Id()
+        public async Task Get_Family_By_Id_OLD()
         {
             using (var context = new TestContextProvider().Context) {
                 var family = FamilyHelper.CreateFamily(context);
