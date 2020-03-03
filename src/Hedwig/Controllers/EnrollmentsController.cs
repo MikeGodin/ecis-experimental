@@ -123,6 +123,7 @@ namespace Hedwig.Controllers
 			// Creating enrollment with Id not allowed
 			if (enrollment.Id != 0) return BadRequest();
 
+			
 			_enrollments.AddEnrollment(enrollment);
 			await _enrollments.SaveChangesAsync();
 
@@ -191,6 +192,12 @@ namespace Hedwig.Controllers
 
 		public void Serialize(Enrollment enrollment)
 		{
+			// // add mapper
+			// var enrollmentDTO = 
+			// if(include.Contains("child"))
+			// {
+
+			// }
 			enrollment.UnsetSelfTypeSubEntities();
 		}
 

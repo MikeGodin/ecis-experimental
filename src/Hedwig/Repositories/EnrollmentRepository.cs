@@ -43,34 +43,34 @@ namespace Hedwig.Repositories
 				.Where(e => e.SiteId == siteId);
 
 
-			include = include ?? new string[] { };
-			if (include.Contains(INCLUDE_SITES))
-			{
-				enrollments = enrollments.Include(e => e.Site);
-			}
+			// include = include ?? new string[] { };
+			// if (include.Contains(INCLUDE_SITES))
+			// {
+			// 	enrollments = enrollments.Include(e => e.Site);
+			// }
 
-			if (include.Contains(INCLUDE_FUNDINGS))
-			{
-				enrollments = enrollments.Include(e => e.Fundings)
-						.ThenInclude(f => f.FirstReportingPeriod)
-					.Include(e => e.Fundings)
-						.ThenInclude(f => f.LastReportingPeriod);
-			}
+			// if (include.Contains(INCLUDE_FUNDINGS))
+			// {
+			// 	enrollments = enrollments.Include(e => e.Fundings)
+			// 			.ThenInclude(f => f.FirstReportingPeriod)
+			// 		.Include(e => e.Fundings)
+			// 			.ThenInclude(f => f.LastReportingPeriod);
+			// }
 
-			if (include.Contains(INCLUDE_CHILD))
-			{
-				enrollments = enrollments.Include(e => e.Child);
+			// if (include.Contains(INCLUDE_CHILD))
+			// {
+			// 	enrollments = enrollments.Include(e => e.Child);
 
-				if (include.Contains(INCLUDE_FAMILY))
-				{
-					enrollments = ((IIncludableQueryable<Enrollment, Child>)enrollments).ThenInclude(c => c.Family);
+			// 	if (include.Contains(INCLUDE_FAMILY))
+			// 	{
+			// 		enrollments = ((IIncludableQueryable<Enrollment, Child>)enrollments).ThenInclude(c => c.Family);
 
-					if (include.Contains(INCLUDE_DETERMINATIONS))
-					{
-						enrollments = ((IIncludableQueryable<Enrollment, Family>)enrollments).ThenInclude(f => f.Determinations);
-					}
-				}
-			}
+			// 		if (include.Contains(INCLUDE_DETERMINATIONS))
+			// 		{
+			// 			enrollments = ((IIncludableQueryable<Enrollment, Family>)enrollments).ThenInclude(f => f.Determinations);
+			// 		}
+			// 	}
+			// }
 
 			return enrollments.ToListAsync();
 		}

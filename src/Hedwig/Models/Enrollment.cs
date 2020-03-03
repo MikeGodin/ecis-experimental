@@ -22,7 +22,7 @@ namespace Hedwig.Models
 		[Required]
 		[SiteIdFromPath]
 		public int SiteId { get; set; }
-		public Site Site { get; set; }
+		public Site Site { get; }
 
 		[JsonConverter(typeof(StringEnumConverter))]
 		public Age? AgeGroup { get; set; }
@@ -38,9 +38,13 @@ namespace Hedwig.Models
 		public string ExitReason { get; set; }
 
 		[CDC_Funding_ReportingPeriodsAreValid]
-		public ICollection<Funding> Fundings { get; set; }
+		public virtual ICollection<Funding> Fundings { get; set; }
 
 		[NotMapped]
 		public List<ValidationError> ValidationErrors { get; set; }
+	}
+
+	public class EnrollmentDTO : Enrollment
+	{
 	}
 }
