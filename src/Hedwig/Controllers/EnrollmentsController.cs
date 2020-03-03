@@ -63,17 +63,7 @@ namespace Hedwig.Controllers
 			var enrollment = await _enrollments.GetEnrollmentForSiteAsync(id, siteId, include);
 			if (enrollment == null) return NotFound();
 
-			// quick fix until we implement more robust solution (DTO or other serialization rules)
-			if (enrollment.Child != null)
-			{
-				enrollment.Child.Enrollments = null;
-			}
-
-			if (enrollment.Site != null)
-			{
-				enrollment.Site.Enrollments = null;
-			}
-
+			Serialize(enrollment);
 			_validator.Validate(enrollment);
 
 			return enrollment;
@@ -116,20 +106,7 @@ namespace Hedwig.Controllers
 				enrollments = await _enrollments.GetEnrollmentsForOrganizationAsync(orgId, from, to, include, asOf);
 			}
 
-			// quick fix until we implement more robust solution (DTO or other serialization rules)
-			foreach (var enrollment in enrollments)
-			{
-				if (enrollment.Child != null)
-				{
-					enrollment.Child.Enrollments = null;
-				}
-
-				if (enrollment.Site != null)
-				{
-					enrollment.Site.Enrollments = null;
-				}
-			}
-
+			Serialize(enrollments);
 			_validator.Validate(enrollments);
 			return enrollments;
 		}
@@ -149,6 +126,7 @@ namespace Hedwig.Controllers
 			_enrollments.AddEnrollment(enrollment);
 			await _enrollments.SaveChangesAsync();
 
+			Serialize(enrollment);
 			_validator.Validate(enrollment);
 			return CreatedAtAction(
 				nameof(Get),
@@ -180,6 +158,7 @@ namespace Hedwig.Controllers
 				return NotFound();
 			}
 
+			Serialize(enrollment);
 			_validator.Validate(enrollment);
 			return Ok(enrollment);
 		}
@@ -208,6 +187,19 @@ namespace Hedwig.Controllers
 			}
 
 			return Ok();
+		}
+
+		public void Serialize(Enrollment enrollment)
+		{
+			enrollment.UnsetSelfTypeSubEntities();
+		}
+
+		public void Serialize(ICollection<Enrollment> enrollments)
+		{
+			foreach(var enrollment in enrollments)
+			{
+				enrollment.UnsetSelfTypeSubEntities();
+			}
 		}
 	}
 }
