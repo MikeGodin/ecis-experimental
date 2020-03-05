@@ -10,6 +10,7 @@ using Hedwig.Validations;
 using Hedwig.Security;
 using System;
 using System.Linq;
+using Hedwig.Serialization;
 
 namespace Hedwig.Controllers
 {
@@ -21,15 +22,18 @@ namespace Hedwig.Controllers
 		private readonly INonBlockingValidator _validator;
 		private readonly IEnrollmentRepository _enrollments;
 		private readonly ISiteRepository _sites;
+		private readonly IEntitySerializer _serializer;
 		public EnrollmentsController(
 			INonBlockingValidator validator,
 			IEnrollmentRepository enrollments,
-			ISiteRepository sites
+			ISiteRepository sites,
+			IEntitySerializer serializer = null
 		)
 		{
 			_validator = validator;
 			_enrollments = enrollments;
 			_sites = sites;
+			_serializer = serializer;
 		}
 
 		[HttpGet]
@@ -130,7 +134,10 @@ namespace Hedwig.Controllers
 				}
 			}
 
+
+			_serializer.Serialize<Enrollment, EnrollmentDTO>(enrollments[0]);
 			_validator.Validate(enrollments);
+
 			return enrollments;
 		}
 

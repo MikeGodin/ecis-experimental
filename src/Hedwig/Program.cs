@@ -60,7 +60,6 @@ namespace Hedwig
 					logging.Services.Configure<Sentry.Extensions.Logging.SentryLoggingOptions>(context.Configuration.GetSection("Sentry"));
 					logging.AddSentry();
 				}
-
 			})
 			.UseSentry()
 			.UseEnvironment(environment)

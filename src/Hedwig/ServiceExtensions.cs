@@ -11,6 +11,8 @@ using Hedwig.Validations;
 using Hedwig.Validations.Rules;
 using Hedwig.Models;
 using Hedwig.HostedServices;
+using AutoMapper;
+using Hedwig.Serialization;
 
 namespace Hedwig
 {
@@ -153,6 +155,12 @@ namespace Hedwig
 		{
 			services.AddScoped<CdcReportGeneratorScopedService>();
 			services.AddHostedService<DailyServiceExecutor>();
+		}
+
+		public static void ConfigureSerializer(this IServiceCollection services)
+		{
+			services.AddAutoMapper(typeof(Startup));
+			services.AddScoped<IEntitySerializer, EntitySerializer>();
 		}
 	}
 }

@@ -6,6 +6,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Hedwig.Validations;
 using Hedwig.Validations.Attributes;
+using AutoMapper;
 
 namespace Hedwig.Models
 {
@@ -41,5 +42,19 @@ namespace Hedwig.Models
 
 		[NotMapped]
 		public List<ValidationError> ValidationErrors { get; set; }
+
+	}
+
+	public class EnrollmentDTO : Enrollment, INonBlockingValidatableObject
+	{
+		// public List<ValidationError> ValidationErrors { get; set; }
+	}
+
+	public class EnrollmentMappingProfile : Profile
+	{
+		public EnrollmentMappingProfile()
+		{
+			CreateMap<Enrollment, EnrollmentDTO>().ReverseMap();
+		}
 	}
 }

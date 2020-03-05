@@ -21,7 +21,7 @@ namespace HedwigTests.Validations.Rules
 		{
 			// if
 			var funding = new Funding();
-			var enrollment = new Enrollment
+			var enrollment = new EnrollmentDTO
 			{
 				Id = 1,
 				Fundings = new Funding[] { funding }

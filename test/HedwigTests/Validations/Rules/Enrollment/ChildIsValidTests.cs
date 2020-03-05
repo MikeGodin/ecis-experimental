@@ -21,7 +21,7 @@ namespace HedwigTests.Validations.Rules
 		{
 			// if
 			var child = new Child();
-			var enrollment = new Enrollment
+			var enrollment = new EnrollmentDTO
 			{
 				ChildId = Guid.NewGuid(),
 				Child = child

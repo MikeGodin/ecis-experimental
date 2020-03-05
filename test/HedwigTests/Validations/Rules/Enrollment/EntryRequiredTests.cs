@@ -16,7 +16,7 @@ namespace HedwigTests.Validations.Rules
 		)
 		{
 			// if
-			var enrollment = new Enrollment();
+			var enrollment = new EnrollmentDTO();
 			if (entryExists)
 			{
 				enrollment.Entry = DateTime.Now;

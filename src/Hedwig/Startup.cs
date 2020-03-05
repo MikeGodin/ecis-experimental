@@ -32,6 +32,7 @@ namespace Hedwig
 			services.ConfigureAuthorization();
 			services.ConfigureValidation();
 			services.ConfigureHostedServices();
+			services.ConfigureSerializer();
 			services.AddSingleton<IDateTime, SystemDateTime>();
 			services.AddSwaggerGen(c =>
 			{
