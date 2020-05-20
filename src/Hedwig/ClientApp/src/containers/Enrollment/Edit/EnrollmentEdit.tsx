@@ -119,10 +119,11 @@ export default function EnrollmentEdit({
 				<h1>Edit {section.name.toLowerCase()}</h1>
 				<p className="usa-intro">{nameFormatter(enrollment.child)}</p>
 				<ErrorBoundary alertProps={editSaveFailAlert}>
-					{section.UpdateForm ?
-						<section.UpdateForm {...sectionFormProps} /> :
+					{section.UpdateForm ? (
+						<section.UpdateForm {...sectionFormProps} />
+					) : (
 						<section.Form {...sectionFormProps} />
-					}
+					)}
 				</ErrorBoundary>
 			</div>
 		</CommonContainer>
