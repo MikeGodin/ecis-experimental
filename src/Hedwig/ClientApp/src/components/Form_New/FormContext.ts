@@ -1,4 +1,4 @@
-import { createContext, Context, useContext } from 'react';
+import { createContext, Context, useContext, Dispatch, SetStateAction } from 'react';
 
 type FormContextType = {
 	data: any;
@@ -19,7 +19,7 @@ export default FormContext;
  */
 export type GenericFormContextType<T> = {
 	data: T;
-	updateData: (_: T) => void;
+	updateData: Dispatch<SetStateAction<T>>;
 };
 /**
  * Utility for casting the un-typed context to the generic with type parameter
