@@ -18,6 +18,7 @@ namespace Hedwig.Models
 		public Organization Organization { get; set; }
 
 		[JsonConverter(typeof(StringEnumConverter))]
+		[Required]
 		public FundingSource Source { get; set; }
 
 		[JsonConverter(typeof(StringEnumConverter))]
