@@ -442,14 +442,13 @@ const EnrollmentFunding: Section = {
 		const [c4kFamilyId, updateC4kFamilyId] = useState<number | null>(
 			child ? child.c4KFamilyCaseNumber : null
 		);
-		const [c4kFunding, updateC4kFunding] = useState<DeepNonUndefineable<C4KCertificate>>(
-			inputC4kFunding ||
-				({
-					id: 0,
-					childId: enrollment.child.id,
-					startDate: null,
-					endDate: null,
-				} as DeepNonUndefineable<C4KCertificate>)
+		const [c4kFunding, updateC4kFunding] = useState<C4KCertificate>(
+			inputC4kFunding || {
+				id: 0,
+				childId: enrollment.child.id,
+				startDate: null,
+				endDate: null,
+			}
 		);
 		const [receivesC4k, updateReceivesC4k] = useState<boolean>(!!inputC4kFunding);
 		const { startDate: c4kCertificateStartDate } = c4kFunding || {};
@@ -759,7 +758,7 @@ const EnrollmentFunding: Section = {
 									displayValidationStatus([
 										{
 											type: 'warning',
-											response: c4kFunding ? c4kFunding.validationErrors : null,
+											response: c4kFunding.validationErrors || null,
 											field: 'startDate',
 											message: REQUIRED_FOR_OEC_REPORTING,
 										},

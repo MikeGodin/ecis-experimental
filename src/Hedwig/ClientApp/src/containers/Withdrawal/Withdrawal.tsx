@@ -190,7 +190,7 @@ export default function Withdrawal({
 				<Form<Enrollment>
 					data={mutatedEnrollment}
 					onSubmit={onFormSubmit}
-					className=""
+					className="usa-form"
 					noValidate
 					autoComplete="off"
 				>

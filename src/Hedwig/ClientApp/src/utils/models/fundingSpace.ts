@@ -79,13 +79,13 @@ function formattedWeeks(includeWeeks: boolean, weeks: number) {
  * @param opts
  */
 export function getFundingSpaces(
-	fundingSpaces: DeepNonUndefineable<FundingSpace[]> | null | undefined,
+	fundingSpaces: FundingSpace[] | null | undefined,
 	opts: {
 		ageGroup?: Age;
 		source?: FundingSource;
 		time?: FundingTime;
 	}
-): DeepNonUndefineable<FundingSpace[]> {
+): FundingSpace[] {
 	if (!fundingSpaces) return [];
 	const { ageGroup, source, time } = opts;
 	return fundingSpaces.filter((space) => {
@@ -152,18 +152,26 @@ export function fundingSpaceSorter(
 
 export function getTimeSplitUtilizationsForFiscalYearOfReport(
 	fundingSpace: FundingSpace,
-	report: DeepNonUndefineable<CdcReport>
+	report: CdcReport
 ) {
+	if (!report.reportingPeriod) {
+		return [];
+	}
 	return ((fundingSpace.timeSplitUtilizations || []) as DeepNonUndefineable<
 		FundingTimeSplitUtilization[]
 	>)
 		.filter((util) => util.reportId !== report.id)
 		.filter((util) => util.fundingSpaceId === fundingSpace.id)
 		.filter((util) =>
-			isWithinFiscalYear(util.reportingPeriod.period, report.reportingPeriod.period)
+			isWithinFiscalYear(
+				util.reportingPeriod.period,
+				report.reportingPeriod && report.reportingPeriod.period
+			)
 		)
 		.filter((util) =>
-			moment(util.reportingPeriod.periodEnd).isBefore(report.reportingPeriod.periodEnd)
+			moment(util.reportingPeriod.periodEnd).isBefore(
+				report.reportingPeriod && report.reportingPeriod.periodEnd
+			)
 		)
 		.filter((util) => !!util.report.submittedAt);
 }

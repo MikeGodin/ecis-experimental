@@ -116,7 +116,7 @@ export const NewForm: React.FC<SectionProps> = ({
 
 	return (
 		<Form<Enrollment>
-			className="ChildInfoForm"
+			className="ChildInfoForm usa-form"
 			// Supply the most up-to-date enrollment to the Form
 			data={mutatedEnrollment}
 			onSubmit={onFormSubmit}
